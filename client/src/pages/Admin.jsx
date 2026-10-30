@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import AdminMaterials from '../components/AdminMaterials.jsx';
+import Announcements from '../components/Announcements.jsx';
 import { AdminPayments } from '../components/ManualUnlock.jsx';
 import InstantNotesUpload from '../components/InstantNotesUpload.jsx';
 import AdminContent from '../components/AdminContent.jsx';
@@ -123,6 +124,8 @@ export default function Admin() {
               <button className="btn ghost" type="submit">Add subtopic</button>
             </form>
           </div>
+
+          {user?.role === 'admin' && <Announcements admin />}
 
           <AdminMaterials courses={courses} onChanged={() => {}} />
 
