@@ -130,7 +130,7 @@ export default function App() {
       <LiveChatWidget />
       {location.pathname !== '/' && (
       <footer className="footer">
-        <div>BiomedAccess. Sample content for learning only, not medical advice.</div>
+        <div>© 2026 BiomedAccess. All rights reserved. Sample content for learning only, not medical advice.</div>
         <div className="footer-links">
           <Link to="/privacy">Privacy Policy</Link>
           <span aria-hidden="true"> · </span>

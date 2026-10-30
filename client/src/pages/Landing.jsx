@@ -435,7 +435,7 @@ export default function Landing() {
           </nav>
         </div>
         <div className="lp-footer-base">
-          <span>BiomedAccess. Sample content for learning only, not medical advice.</span>
+          <span>© 2026 BiomedAccess. All rights reserved. Sample content for learning only, not medical advice.</span>
           <span>Affiliated with Rusangu University</span>
         </div>
       </footer>
