@@ -104,7 +104,7 @@ app.get('/api/admin/courses/:id/tree', requireAdmin, async (req, res) => {
 const dist = path.join(here, '../../client/dist');
 if (fs.existsSync(dist)) {
   app.use(express.static(dist));
-  app.use('/downloads', express.static(path.join(__dirname, '..', 'downloads')));
+  app.use('/downloads', express.static(path.join(here, '../downloads')));
   app.get(/^\/(?!api).*/, (_req, res) => res.sendFile(path.join(dist, 'index.html')));
 }
 
