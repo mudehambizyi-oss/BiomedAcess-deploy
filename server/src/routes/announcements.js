@@ -17,6 +17,17 @@ router.post('/admin/announcements', requireAdmin, async (req, res) => {
   if (!title) return res.status(400).json({ error: 'Announcement title is required.' });
   const pinned = req.body.pinned ? 1 : 0;
   const info = await db.run('INSERT INTO announcements (title, body, pinned, created_by) VALUES (?,?,?,?)', [title, body, pinned, req.user.id]);
+
+  // Forward to the Telegram channel when TELEGRAM_ANNOUNCE_CHANNEL is set (e.g. @biomedaccess or -1001234...).
+  const channel = process.env.TELEGRAM_ANNOUNCE_CHANNEL;
+  if (channel) {
+    const text = `📢 *${title}*\n\n${body}\n\n— BiomedAccess`;
+    fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN || ''}/sendMessage`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: channel, text, parse_mode: 'Markdown' }),
+    }).catch(() => {});
+  }
+
   res.status(201).json({ id: info.lastInsertRowid, title, body, pinned, created_at: new Date().toISOString() });
 });
 
