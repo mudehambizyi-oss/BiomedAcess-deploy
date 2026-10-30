@@ -23,6 +23,11 @@ router.post('/quizzes/:id/attempt', requireAuth, async (req, res) => {
   const quiz = (await db.get('SELECT q.*, t.course_id, t.id AS topic_id FROM quizzes q JOIN topics t ON t.id = q.topic_id WHERE q.id = ?', [req.params.id]));
   if (!quiz) return res.status(404).json({ error: 'Quiz not found.' });
   if (!await courseAccess(req.user.id, req.user.role, quiz.course_id)) return res.status(403).json({ error: 'Enroll in this course to take the quiz.' });
+  // One attempt per student per quiz. Admins keep unlimited attempts for testing.
+  if (req.user.role !== 'admin') {
+    const prior = await db.get('SELECT 1 AS x FROM quiz_attempts WHERE user_id = ? AND quiz_id = ?', [req.user.id, quiz.id]);
+    if (prior) return res.status(409).json({ error: 'You have already taken this quiz. Only one attempt is allowed.', already_taken: true });
+  }
   const answers = req.body?.answers || {};
   const questions = (await db.all('SELECT * FROM questions WHERE quiz_id = ? ORDER BY position, id', [quiz.id]));
   if (questions.length === 0) return res.status(400).json({ error: 'This quiz has no questions.' });

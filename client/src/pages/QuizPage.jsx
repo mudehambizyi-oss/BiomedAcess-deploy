@@ -25,7 +25,7 @@ export default function QuizPage() {
       const r = await api(`/quizzes/${quiz.id}/attempt`, { method: 'POST', body: { answers } });
       setResult(r);
       window.scrollTo(0, 0);
-    } catch (err) { setError(err.message); } finally { setBusy(false); }
+    } catch (err) { if (err.already_taken) { setResult({ already_taken: true, score: 0, total: 0, details: [] }); } else setError(err.message); } finally { setBusy(false); }
   }
 
   if (error && !quiz) return <div className="container"><div className="alert error">{error}</div></div>;
@@ -39,7 +39,9 @@ export default function QuizPage() {
           <h2>{result.score} of {result.total} correct</h2>
           <p className="muted">{result.percent >= 70 ? 'Nice work. You are above the 70% passing mark.' : 'Below the 70% mark. Review the explanations and try again.'}</p>
           <div className="row" style={{ justifyContent: 'center' }}>
-            <button className="btn" onClick={() => { setResult(null); setAnswers({}); }}>Retake quiz</button>
+            {result.already_taken
+              ? <p className="small muted">You have used your one attempt for this quiz.</p>
+              : <button className="btn" onClick={() => { setResult(null); setAnswers({}); }}>Retake quiz</button>}
             <Link to={`/topics/${id}`} className="btn light">Back to topic</Link>
             <Link to="/analytics" className="btn light">View analytics</Link>
           </div>
