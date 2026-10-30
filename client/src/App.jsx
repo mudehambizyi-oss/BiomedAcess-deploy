@@ -44,6 +44,18 @@ function RequireAdmin({ children }) {
 }
 
 function ThemeToggle() {
+  // Telegram Mini App: auto-login with Telegram identity when opened inside Telegram.
+  React.useEffect(() => {
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (!tg || !tg.initData || window.__tgLoginDone) return;
+    window.__tgLoginDone = true;
+    try { tg.expand(); tg.ready(); } catch {}
+    fetch('/api/auth/telegram', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ initData: tg.initData }) })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d && d.token) { window.location.reload(); localStorage.setItem('biomedaccess_token', d.token); } })
+      .catch(() => {});
+  }, []);
+
   const [theme, setTheme] = React.useState(getStoredTheme);
   React.useEffect(() => {
     applyTheme(theme);

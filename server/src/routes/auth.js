@@ -34,6 +34,31 @@ router.get('/me', requireAuth, (req, res) => {
   res.json(req.user);
 });
 
+
+// Telegram Mini App login: verify initData signature, upsert user, return app JWT.
+router.post('/telegram', async (req, res) => {
+  const initData = String(req.body?.initData || '');
+  if (!initData) return res.status(400).json({ error: 'Missing Telegram data.' });
+  const token = process.env.BOT_TOKEN;
+  if (!token) return res.status(500).json({ error: 'Telegram login is not configured.' });
+  const secret = crypto.createHmac('sha256', 'WebAppData').update(token).digest();
+  const params = new URLSearchParams(initData);
+  const hash = params.get('hash');
+  params.delete('hash');
+  params.sort();
+  const check = crypto.createHmac('sha256', secret).update(params.toString()).digest('hex');
+  if (check !== hash) return res.status(401).json({ error: 'Telegram verification failed.' });
+  const user = JSON.parse(params.get('user') || '{}');
+  if (!user.id) return res.status(400).json({ error: 'No Telegram user.' });
+  const email = `tg${user.id}@telegram.biomedaccess`;
+  let row = (await db.get('SELECT id, email, name, role FROM users WHERE email = ?', [email]));
+  if (!row) {
+    const id = (await db.run('INSERT INTO users (email, password_hash, name, role) VALUES (?,?,?,?,?)'.replace('(?,?,?,?,?)','(?,?,?,?)'), [email, 'telegram', (user.first_name || '') + ' ' + (user.last_name || '') || 'Telegram user', 'student'])).lastInsertRowid;
+    row = { id, email, name: (user.first_name || '') + ' ' + (user.last_name || '') || 'Telegram user', role: 'student' };
+  }
+  res.json({ token: signToken(row), user: { id: row.id, email: row.email, name: row.name, role: row.role } });
+});
+
 export default router;
 
 // Firebase Google sign-in: verify the Google ID token (Firebase issues real Google tokens), then issue our JWT
