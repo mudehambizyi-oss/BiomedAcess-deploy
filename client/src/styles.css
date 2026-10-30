@@ -366,3 +366,7 @@ label { color: var(--ink); }
 :root.light-theme .tagline { color: #059669; }
 :root.light-theme .error { background: #fee2e2; color: #991b1b; }
 :root.light-theme .lock-note { color: #92400e; }
+
+/* Hero outline buttons: keep white text on dark hero in both themes */
+:root.light-theme .btn.ghost.lp-btn-outline,
+:root.light-theme a.lp-btn-outline { color: #ffffff !important; border-color: rgba(224, 123, 57, 0.7) !important; }
