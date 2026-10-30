@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { StreakCard, SavedSection, LabOfTheWeek } from '../components/Features.jsx';
 import { CertificatesSection } from '../components/Certificates.jsx';
+import Announcements from '../components/Announcements.jsx';
 
 // Student dashboard: enrolled courses, progress, recent topics, weak areas, quiz scores, recommendations.
 export default function Dashboard() {
@@ -22,6 +23,7 @@ export default function Dashboard() {
   const pctOf = (c) => Math.min(100, Math.max(0, Math.round(c.progress?.percent ?? c.percent ?? 0)));
   return (
     <div className="container">
+      <Announcements />
       <div className="page-head welcome-head">
         <div>
           <p className="tagline">Your dashboard</p>

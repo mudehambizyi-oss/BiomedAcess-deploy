@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import '../landing.css';
+import Announcements from '../components/Announcements.jsx';
 
 const HERO_BG = 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=1800&q=70&auto=format&fit=crop';
 
@@ -399,7 +400,14 @@ export default function Landing() {
       </section>
 
       {/* 7. FOOTER */}
-      <footer className="lp-footer">
+            {/* Announcements */}
+      <section className="lp-announcements" aria-label="Announcements">
+        <div className="container">
+          <Announcements />
+        </div>
+      </section>
+
+<footer className="lp-footer">
         <div className="lp-footer-grid">
           <div className="lp-footer-brand">
             <strong>BiomedAccess</strong>
