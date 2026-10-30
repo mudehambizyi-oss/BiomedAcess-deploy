@@ -218,6 +218,9 @@ export default function Landing() {
               <Link to="/courses" className="btn ghost lp-btn-lg lp-btn-outline">
                 Explore courses <Icon name="arrow" size={18} />
               </Link>
+              <a href="/downloads/biomedaccess.apk" download className="btn ghost lp-btn-lg lp-btn-outline">
+                Download Android app
+              </a>
             </div>
             <p className="lp-micro">Free core courses · Built for Zambia and the region</p>
           </Reveal>
