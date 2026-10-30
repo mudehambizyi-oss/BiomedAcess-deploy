@@ -1,10 +1,8 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "zm.biomedaccess.app",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_RELEASE_KEY_SHA256"]
-    }
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.biomedaccess.app",
+    "sha256_cert_fingerprints": ["17:86:01:72:BD:E2:C7:31:44:11:C4:77:C8:5C:08:0D:08:C4:55:41:D9:97:DB:FB:AD:97:0A:15:5E:94:DE:FD"]
   }
-]
+}]
