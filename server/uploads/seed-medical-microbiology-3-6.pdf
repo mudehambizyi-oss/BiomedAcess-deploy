@@ -1,0 +1,54 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 1011 >>
+stream
+BT /F1 11 Tf 14 TL 60 760 Td
+(The Gram stain) Tj
+T* () Tj
+T* (THE GRAM STAIN \(sample notes\)) Tj
+T* () Tj
+T* (Steps) Tj
+T* (1. Crystal violet \(primary stain\) is applied to all cells.) Tj
+T* (2. Gram's iodine is applied as a mordant, forming a crystal violet-iodine complex.) Tj
+T* (3. Decolouriser \(ethanol or acetone\) is applied briefly.) Tj
+T* (4. Safranin \(counterstain\) is applied last.) Tj
+T* () Tj
+T* (Result) Tj
+T* (- Gram-positive cells retain the crystal violet complex \(thick peptidoglycan traps it\) and) Tj
+T* (appear purple.) Tj
+T* (- Gram-negative cells lose the complex in the decolouriser \(the outer membrane is disrupted) Tj
+T* (and the thin wall cannot retain it\) and take up safranin, appearing pink or red.) Tj
+T* () Tj
+T* (Common mistakes) Tj
+T* (- Over-decolourising a Gram-positive culture can make it falsely appear Gram-negative.) Tj
+T* (- Old cultures can stain Gram-variable.) Tj
+T* () Tj
+T* (Study tip: remember "purple = peptidoglycan thick, pink = outer membrane".) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000001248 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1374
+%%EOF

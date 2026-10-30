@@ -1,0 +1,53 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 1071 >>
+stream
+BT /F1 11 Tf 14 TL 60 760 Td
+(Viral structure and replication cycle) Tj
+T* () Tj
+T* (VIRAL STRUCTURE AND REPLICATION \(sample notes\)) Tj
+T* () Tj
+T* (Structure) Tj
+T* (- Genome: DNA or RNA \(single or double stranded, linear or segmented\).) Tj
+T* (- Capsid: protein shell that protects the genome.) Tj
+T* (- Envelope: lipid membrane acquired from the host cell in some viruses \(for example,) Tj
+T* (influenza, HIV\). Enveloped viruses are often more sensitive to detergents and drying.) Tj
+T* () Tj
+T* (Replication cycle \(general\)) Tj
+T* (1. Attachment: viral surface protein binds a host receptor.) Tj
+T* (2. Penetration / entry: membrane fusion or endocytosis.) Tj
+T* (3. Uncoating: release of the genome.) Tj
+T* (4. Replication and transcription: depends on genome type.) Tj
+T* (5. Assembly: new capsids and genomes are assembled.) Tj
+T* (6. Release: lysis \(non-enveloped\) or budding \(enveloped\).) Tj
+T* () Tj
+T* (Note: retroviruses such as HIV use reverse transcriptase to make DNA from their RNA genome,) Tj
+T* (which integrates into the host genome.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000001308 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1434
+%%EOF

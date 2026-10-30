@@ -1,0 +1,53 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 1000 >>
+stream
+BT /F1 11 Tf 14 TL 60 760 Td
+(Composition of blood) Tj
+T* () Tj
+T* (COMPOSITION OF BLOOD \(sample notes\)) Tj
+T* () Tj
+T* (Blood is about 55% plasma and 45% formed elements \(by volume, in typical adults, haematocrit) Tj
+T* (around 45%\).) Tj
+T* () Tj
+T* (Plasma) Tj
+T* (- About 90% water. Major proteins: albumin \(oncotic pressure, transport\), globulins) Tj
+T* (\(immunoglobulins among them\), fibrinogen \(clotting\).) Tj
+T* () Tj
+T* (Formed elements) Tj
+T* (- Erythrocytes \(red cells\): anucleate, biconcave, carry haemoglobin. Lifespan about 120) Tj
+T* (days.) Tj
+T* (- Leukocytes \(white cells\): neutrophils, lymphocytes, monocytes, eosinophils, basophils.) Tj
+T* (- Platelets \(thrombocytes\): cell fragments from megakaryocytes; essential for primary) Tj
+T* (haemostasis.) Tj
+T* () Tj
+T* (Clinical link: a full blood count \(FBC\) quantifies these elements and their indices \(for) Tj
+T* (example, MCV, MCH\), giving first-line clues about anaemia, infection and bleeding disorders.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000001237 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1363
+%%EOF

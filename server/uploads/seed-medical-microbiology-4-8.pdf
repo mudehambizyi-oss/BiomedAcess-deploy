@@ -1,0 +1,51 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 939 >>
+stream
+BT /F1 11 Tf 14 TL 60 760 Td
+(Viral pathogenesis and immunity) Tj
+T* () Tj
+T* (VIRAL PATHOGENESIS AND IMMUNITY \(sample notes\)) Tj
+T* () Tj
+T* (Mechanisms of damage) Tj
+T* (- Direct cytopathic effect: lysis of infected cells or syncytia formation.) Tj
+T* (- Immune-mediated damage: cytotoxic T-cell killing of infected cells, or inflammatory) Tj
+T* (responses.) Tj
+T* (- Oncogenesis: some viruses \(for example, HPV\) can drive uncontrolled cell growth.) Tj
+T* () Tj
+T* (Host defence) Tj
+T* (- Innate: interferons \(type I\) induce antiviral states in neighbouring cells; natural killer) Tj
+T* (cells kill infected cells lacking MHC class I.) Tj
+T* (- Adaptive: neutralising antibodies block entry; CD8+ cytotoxic T cells eliminate infected) Tj
+T* (cells; CD4+ helper cells coordinate the response.) Tj
+T* () Tj
+T* (Clinical link: vaccines work by priming neutralising antibodies and memory T cells without) Tj
+T* (causing disease.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000001175 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1301
+%%EOF

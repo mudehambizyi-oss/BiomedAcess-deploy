@@ -1,0 +1,50 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 985 >>
+stream
+BT /F1 11 Tf 14 TL 60 760 Td
+(The bacterial cell envelope) Tj
+T* () Tj
+T* (THE BACTERIAL CELL ENVELOPE \(sample notes\)) Tj
+T* () Tj
+T* (Key components) Tj
+T* (- Cell membrane: phospholipid bilayer; site of respiration and transport in bacteria.) Tj
+T* (- Peptidoglycan \(murein\) cell wall: polymer of N-acetylglucosamine and N-acetylmuramic acid) Tj
+T* (with peptide cross-links. The target of penicillins and cephalosporins.) Tj
+T* (- Gram-positive walls: thick peptidoglycan layer, teichoic acids.) Tj
+T* (- Gram-negative walls: thin peptidoglycan plus an outer membrane containing) Tj
+T* (lipopolysaccharide \(LPS, endotoxin\).) Tj
+T* (- Capsule: polysaccharide layer that resists phagocytosis; a major virulence factor \(e.g.) Tj
+T* (Streptococcus pneumoniae\).) Tj
+T* (- Flagella, pili and fimbriae: motility and attachment.) Tj
+T* () Tj
+T* (Clinical link: because LPS is part of the outer membrane of Gram-negative bacteria, it is a) Tj
+T* (major driver of septic shock.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000001221 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1347
+%%EOF

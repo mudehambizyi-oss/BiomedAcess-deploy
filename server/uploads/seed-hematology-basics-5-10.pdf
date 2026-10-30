@@ -1,0 +1,53 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 1009 >>
+stream
+BT /F1 11 Tf 14 TL 60 760 Td
+(Haemopoiesis) Tj
+T* () Tj
+T* (HAEMOPOIESIS \(sample notes\)) Tj
+T* () Tj
+T* (All blood cells derive from haematopoietic stem cells \(HSCs\) in the bone marrow. HSCs are) Tj
+T* (self-renewing and pluripotent.) Tj
+T* () Tj
+T* (Two main lineages) Tj
+T* (- Common myeloid progenitor: erythrocytes, megakaryocytes \(platelets\), granulocytes) Tj
+T* (\(neutrophils, eosinophils, basophils\), monocytes \(which become macrophages and dendritic) Tj
+T* (cells\).) Tj
+T* (- Common lymphoid progenitor: B cells, T cells, natural killer cells.) Tj
+T* () Tj
+T* (Key growth factors) Tj
+T* (- Erythropoietin \(EPO\), made by the kidney, drives red cell production.) Tj
+T* (- Thrombopoietin \(TPO\), mainly from the liver, drives platelet production.) Tj
+T* (- G-CSF stimulates neutrophil production.) Tj
+T* () Tj
+T* (Clinical link: anaemia of chronic kidney disease is often treated with) Tj
+T* (erythropoiesis-stimulating agents because EPO production falls as kidney function declines.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000001246 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1372
+%%EOF
