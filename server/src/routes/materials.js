@@ -278,6 +278,11 @@ router.post('/exams/:id/submit', requireAuth, async (req, res) => {
   if (!await courseAccess(req.user.id, req.user.role, e.course_id)) return res.status(403).json({ error: 'Enroll in this course to take the exam.' });
   if (req.user.role !== 'admin' && !await examOpenFor(e, req.user.id)) return res.status(423).json({ error: lockedMessage(e), locked: true });
   if (req.user.role !== 'admin' && examClosed(e)) return res.status(423).json({ error: 'This exam has closed.', closed: true });
+  // One attempt per student per exam. Admins keep retakes for testing.
+  if (req.user.role !== 'admin') {
+    const prior = await db.get('SELECT 1 AS x FROM exam_attempts WHERE exam_id = ? AND user_id = ?', [e.id, req.user.id]);
+    if (prior) return res.status(409).json({ error: 'You have already taken this exam. Only one attempt is allowed.', already_taken: true });
+  }
   const questions = await examQuestions(e.id, true);
   if (questions.length === 0) return res.status(400).json({ error: 'This exam has no in-app questions.' });
   const answers = req.body?.answers && typeof req.body.answers === 'object' ? req.body.answers : {};
@@ -365,6 +370,11 @@ router.get('/exams/:id/download', requireAuth, async (req, res) => {
   if (!await courseAccess(req.user.id, req.user.role, e.course_id)) return res.status(403).json({ error: 'Enroll in this course to download exams.' });
   if (req.user.role !== 'admin' && !await examOpenFor(e, req.user.id)) return res.status(423).json({ error: lockedMessage(e), locked: true });
   if (req.user.role !== 'admin' && examClosed(e)) return res.status(423).json({ error: 'This exam has closed.', closed: true });
+  // One attempt per student per exam. Admins keep retakes for testing.
+  if (req.user.role !== 'admin') {
+    const prior = await db.get('SELECT 1 AS x FROM exam_attempts WHERE exam_id = ? AND user_id = ?', [e.id, req.user.id]);
+    if (prior) return res.status(409).json({ error: 'You have already taken this exam. Only one attempt is allowed.', already_taken: true });
+  }
   if (!e.file_path) return res.status(404).json({ error: 'This exam has no PDF attached.' });
   return sendStored(res, e.file_path, e.original_name, e.mime);
 });
