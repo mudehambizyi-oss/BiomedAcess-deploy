@@ -30,6 +30,10 @@
 
 /* Light theme: white / near-white surfaces, accent colors unchanged */
 :root.light-theme {
+  --blue: #059669;
+  --teal: #c2591d;
+  --warn: #b45309;
+  --danger: #dc2626;
   color-scheme: light;
   --navy: #0f172a;
   --ink: #0f172a;
@@ -344,3 +348,21 @@ label { color: var(--ink); }
 .landing-hero .hero-copy p { line-height: 1.6; }
 .footer { margin-top: 64px; border-top: 1px solid var(--line); padding: 32px 20px; }
 .footer-links a { margin: 0 4px; }
+
+/* Light theme readability fixes */
+:root.light-theme body { color: var(--ink); background: var(--bg); }
+:root.light-theme a { color: #056a4c; }
+:root.light-theme a:hover { color: #059669; }
+:root.light-theme .muted { color: #52627a; }
+:root.light-theme th { color: #334155; }
+:root.light-theme td { color: #0f172a; }
+:root.light-theme input, :root.light-theme textarea, :root.light-theme select { color: #0f172a; background: #fff; }
+:root.light-theme .btn.teal { background: #059669; color: #fff; }
+:root.light-theme .btn.ghost { background: transparent; color: #0f172a; border-color: #cbd5e1; }
+:root.light-theme .badge.teal { background: rgba(5,150,105,0.14); color: #065f46; }
+:root.light-theme .badge.lock { background: rgba(180,83,9,0.14); color: #92400e; }
+:root.light-theme .alert.error { color: #991b1b; background: #fee2e2; }
+:root.light-theme .alert.info, :root.light-theme .info { background: #e0f2f1; color: #065f46; }
+:root.light-theme .tagline { color: #059669; }
+:root.light-theme .error { background: #fee2e2; color: #991b1b; }
+:root.light-theme .lock-note { color: #92400e; }
