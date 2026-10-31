@@ -225,6 +225,9 @@ export default function Landing() {
               <a href="https://t.me/biomedaccess" target="_blank" rel="noreferrer" className="btn ghost lp-btn-lg lp-btn-outline">
                 Join our Telegram
               </a>
+              <a href="https://t.me/biomedaccess_tutor_bot" target="_blank" rel="noreferrer" className="btn ghost lp-btn-lg lp-btn-outline">
+                Tutor bot on Telegram
+              </a>
             </div>
             <p className="lp-micro">Free core courses · Built for Zambia and the region</p>
           </Reveal>
