@@ -7,6 +7,7 @@ import Announcements from '../components/Announcements.jsx';
 import { AdminPayments } from '../components/ManualUnlock.jsx';
 import InstantNotesUpload from '../components/InstantNotesUpload.jsx';
 import AdminContent from '../components/AdminContent.jsx';
+import { AdminPhase3 } from './Phase3.jsx';
 import { STUDY_TRACKS, TRACK_VALUES } from '../components/StudyTracks.jsx';
 
 // Admin dashboard: course/topic/resource/quiz management, user list, uploads, platform stats.
@@ -84,7 +85,7 @@ export default function Admin() {
             <button className={`btn small ${tab === 'content' ? 'teal' : 'ghost'}`} onClick={() => setTab('content')}>Communities, cases & contact</button>
           </div>
           {tab === 'payments' && <AdminPayments />}
-          {tab === 'content' && <AdminContent />}
+          {tab === 'content' && <><AdminContent /><AdminPhase3 /></>}
         </>}
 
       {(user?.role !== 'admin' || tab === 'overview') && <>

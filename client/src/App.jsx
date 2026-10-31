@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from './auth.jsx';
 import { applyTheme, getStoredTheme, storeTheme } from './lib/theme.js';
+import { ClinicalCases, ClinicalCasePlayer, Careers } from './pages/Phase3.jsx';
 import Landing from './pages/Landing.jsx';
 import { Login, Signup } from './pages/Auth.jsx';
 import Courses from './pages/Courses.jsx';
@@ -97,6 +98,7 @@ function Nav() {
           <NavLink to="/courses">Courses</NavLink>
           {user && <NavLink to={['admin', 'moderator', 'tutor'].includes(user.role) ? '/admin' : '/dashboard'}>{user.role === 'admin' ? 'Admin' : user.role === 'moderator' ? 'Moderator' : user.role === 'tutor' ? 'Tutor' : 'Dashboard'}</NavLink>}
           {user && <NavLink to="/communities">Communities</NavLink>}
+          <NavLink to="/careers">Careers</NavLink>
           {user && <NavLink to="/cases">Case studies</NavLink>}
           {user && !['tutor'].includes(user.role) && <NavLink to="/analytics">Analytics</NavLink>}
           {user && <NavLink to="/profile">Profile</NavLink>}
@@ -138,8 +140,11 @@ export default function App() {
         <Route path="/communities" element={<RequireAuth><Communities /></RequireAuth>} />
         <Route path="/communities/:id" element={<RequireAuth><CommunityThreads /></RequireAuth>} />
         <Route path="/threads/:id" element={<RequireAuth><ThreadView /></RequireAuth>} />
-        <Route path="/cases" element={<RequireAuth><Cases /></RequireAuth>} />
-        <Route path="/cases/:id" element={<RequireAuth><CaseDetail /></RequireAuth>} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/cases" element={<RequireAuth><ClinicalCases /></RequireAuth>} />
+        <Route path="/cases/:id" element={<RequireAuth><ClinicalCasePlayer /></RequireAuth>} />
+        <Route path="/legacy-cases" element={<RequireAuth><Cases /></RequireAuth>} />
+        <Route path="/legacy-cases/:id" element={<RequireAuth><CaseDetail /></RequireAuth>} />
         <Route path="/analytics" element={<RequireAuth><Analytics /></RequireAuth>} />
         <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
         <Route path="/admin" element={<RequireModerator><Admin /></RequireModerator>} />
@@ -157,6 +162,8 @@ export default function App() {
           <Link to="/privacy">Privacy Policy</Link>
           <span aria-hidden="true"> · </span>
           <Link to="/terms">Terms of Service</Link>
+          <span aria-hidden="true"> · </span>
+          <Link to="/careers">Careers</Link>
           <span aria-hidden="true"> · </span>
           <Link to="/contact">Contact us</Link>
         </div>

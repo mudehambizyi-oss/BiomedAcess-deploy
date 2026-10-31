@@ -433,6 +433,11 @@ for (const [slug, label] of Object.entries(DISCIPLINE_BY_SLUG)) {
   await db.run("UPDATE courses SET discipline = ? WHERE slug = ? AND discipline = ''", [label, slug]);
 }
 
+// Phase 3 clinical cases and careers board, separate from the legacy case-study tables.
+await db.exec(`CREATE TABLE IF NOT EXISTS clinical_cases (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, specialty TEXT NOT NULL DEFAULT '', difficulty INTEGER NOT NULL DEFAULT 1, track TEXT, stem TEXT NOT NULL, questions TEXT NOT NULL DEFAULT '[]', created_at TEXT NOT NULL DEFAULT (datetime('now')));
+CREATE TABLE IF NOT EXISTS clinical_case_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT, case_id INTEGER NOT NULL REFERENCES clinical_cases(id) ON DELETE CASCADE, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, answers TEXT NOT NULL, score INTEGER NOT NULL, total INTEGER NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE(user_id, case_id));
+CREATE TABLE IF NOT EXISTS jobs (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, org TEXT NOT NULL, location TEXT NOT NULL, deadline TEXT, apply_url TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT (datetime('now')));`);
+
 // Promote the account in ADMIN_EMAIL to admin on boot (idempotent)
 if (process.env.ADMIN_EMAIL) {
   await db.run("UPDATE users SET role='admin' WHERE email = ? COLLATE NOCASE", [process.env.ADMIN_EMAIL.trim()]);

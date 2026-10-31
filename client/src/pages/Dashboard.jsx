@@ -28,7 +28,7 @@ export default function Dashboard() {
         <div>
           <p className="tagline">Your dashboard</p>
           <h1>Welcome back, {(data.user.name || '').split(' ')[0] || 'there'}</h1>
-          <p className="muted">Pick up where you left off or work on your weak areas.</p>
+          <p className="muted">Pick up where you left off or work on your weak areas. <Link to="/cases">Explore clinical cases</Link> · <Link to="/careers">Browse careers</Link></p>
         </div>
       </div>
 
