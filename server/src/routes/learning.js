@@ -108,7 +108,7 @@ router.get('/dashboard', requireAuth, async (req, res) => {
     FROM activity a JOIN topics t ON t.id = a.topic_id JOIN courses c ON c.id = t.course_id
     WHERE a.user_id = ? AND c.published = 1 ORDER BY a.last_accessed_at DESC LIMIT 5`, [uid]));
 
-  const recommended = (await db.all(`SELECT c.id, c.slug, c.title, c.description, c.level, c.is_paid, c.price_cents, c.currency, c.tracks FROM courses c
+  const recommended = (await db.all(`SELECT c.id, c.slug, c.title, c.description, c.level, c.is_paid, c.price_cents, c.currency, c.tracks, c.image_url FROM courses c
     WHERE c.published = 1 AND c.id NOT IN (SELECT course_id FROM enrollments WHERE user_id = ?) ORDER BY c.position`, [uid]))
     .map((c) => ({ ...c, is_paid: !!c.is_paid, track_targets: parseTracks(c.tracks) }));
   const track = req.user.track || null;
