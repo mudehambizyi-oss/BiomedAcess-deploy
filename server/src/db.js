@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   name TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student','tutor','moderator','admin')),
+  track TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE TABLE IF NOT EXISTS courses (
@@ -179,6 +180,7 @@ CREATE TABLE IF NOT EXISTS courses (
   price_cents INTEGER NOT NULL DEFAULT 0,
   currency TEXT NOT NULL DEFAULT 'usd',
   published INTEGER NOT NULL DEFAULT 1,
+  tracks TEXT,
   position INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -318,6 +320,14 @@ CREATE TABLE IF NOT EXISTS payments (
 `;
 await db.exec(SCHEMA);
 
+// Add track fields to existing databases before any table rebuilds.
+if (!(await db.get("SELECT 1 AS x FROM pragma_table_info('users') WHERE name = 'track'"))) {
+  await db.exec('ALTER TABLE users ADD COLUMN track TEXT');
+}
+if (!(await db.get("SELECT 1 AS x FROM pragma_table_info('courses') WHERE name = 'tracks'"))) {
+  await db.exec('ALTER TABLE courses ADD COLUMN tracks TEXT');
+}
+
 // Existing databases have the old role CHECK constraint. Rebuild only that table in place
 // while foreign-key enforcement is briefly disabled, preserving all users and references.
 const usersSql = await db.get("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'");
@@ -330,10 +340,11 @@ if (usersSql && !usersSql.sql.includes("'tutor'")) {
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student','tutor','moderator','admin')),
+      track TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
-      INSERT INTO users_role_migration (id,email,password_hash,name,role,created_at)
-        SELECT id,email,password_hash,name,role,created_at FROM users;
+      INSERT INTO users_role_migration (id,email,password_hash,name,role,track,created_at)
+        SELECT id,email,password_hash,name,role,track,created_at FROM users;
       DROP TABLE users;
       ALTER TABLE users_role_migration RENAME TO users;`);
   } finally {

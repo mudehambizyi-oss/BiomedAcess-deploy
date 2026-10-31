@@ -18,6 +18,7 @@ import { PrivacyPage, TermsPage } from './pages/Legal.jsx';
 import Contact from './pages/Contact.jsx';
 import { SearchBar, SearchPage } from './components/Features.jsx';
 import LiveChatWidget from './components/LiveChatWidget.jsx';
+import { TrackChooser } from './components/StudyTracks.jsx';
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -25,6 +26,15 @@ function RequireAuth({ children }) {
   if (loading) return <div className="container"><p className="muted">Loading...</p></div>;
   if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   return children;
+}
+
+function RequireTrack({ children }) {
+  const { user, loading, setUser } = useAuth();
+  const [deferred, setDeferred] = React.useState(() => sessionStorage.getItem('trackDeferred') === '1');
+  if (loading) return <div className="container"><p className="muted">Loading...</p></div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.track || deferred || user.role !== 'student') return children;
+  return <TrackChooser user={user} onDone={(track) => { setUser({ ...user, track }); if (!track) { sessionStorage.setItem('trackDeferred', '1'); setDeferred(true); } else sessionStorage.removeItem('trackDeferred'); }} />;
 }
 
 function RequireModerator({ children }) {
@@ -124,7 +134,7 @@ export default function App() {
         <Route path="/topics/:id/sub/:subId" element={<RequireAuth><TopicPage /></RequireAuth>} />
         <Route path="/topics/:id/quiz" element={<RequireAuth><QuizPage /></RequireAuth>} />
         <Route path="/exams/:id" element={<RequireAuth><ExamPage /></RequireAuth>} />
-        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+        <Route path="/dashboard" element={<RequireTrack><Dashboard /></RequireTrack>} />
         <Route path="/communities" element={<RequireAuth><Communities /></RequireAuth>} />
         <Route path="/communities/:id" element={<RequireAuth><CommunityThreads /></RequireAuth>} />
         <Route path="/threads/:id" element={<RequireAuth><ThreadView /></RequireAuth>} />

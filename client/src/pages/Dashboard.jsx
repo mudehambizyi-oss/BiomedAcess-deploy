@@ -45,6 +45,16 @@ export default function Dashboard() {
 
       <div className="split">
         <section>
+          {data.for_track_courses?.length > 0 && <>
+            <h2>For your track</h2>
+            <div className="grid cols-2">
+              {data.for_track_courses.map((c) => <Link key={c.id} to={`/courses/${c.id}`} className="card course-tile"><div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}><h3>{c.title}</h3><span className="badge">{c.track_targets?.length ? 'For your track' : 'All tracks'}</span></div><p className="small muted">{c.level}{c.discipline ? ` · ${c.discipline}` : ''}</p><p className="small">{c.description}</p></Link>)}
+            </div>
+          </>}
+          {data.other_courses?.length > 0 && <>
+            <h2>Other courses</h2>
+            <div className="grid cols-2">{data.other_courses.map((c) => <Link key={c.id} to={`/courses/${c.id}`} className="card course-tile"><h3>{c.title}</h3><p className="small muted">{c.level}{c.discipline ? ` · ${c.discipline}` : ''}</p></Link>)}</div>
+          </>}
           <h2>Your courses</h2>
           {data.courses.length === 0 && (
             <div className="empty card">You are not enrolled in any course yet. <Link to="/courses">Browse courses</Link>.</div>

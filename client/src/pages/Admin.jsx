@@ -7,6 +7,7 @@ import Announcements from '../components/Announcements.jsx';
 import { AdminPayments } from '../components/ManualUnlock.jsx';
 import InstantNotesUpload from '../components/InstantNotesUpload.jsx';
 import AdminContent from '../components/AdminContent.jsx';
+import { STUDY_TRACKS, TRACK_VALUES } from '../components/StudyTracks.jsx';
 
 // Admin dashboard: course/topic/resource/quiz management, user list, uploads, platform stats.
 export default function Admin() {
@@ -19,7 +20,7 @@ export default function Admin() {
   const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
-  const [course, setCourse] = useState({ title: '', description: '', image_url: '', level: 'Beginner', is_paid: false, price_cents: 0 });
+  const [course, setCourse] = useState({ title: '', description: '', image_url: '', level: 'Beginner', is_paid: false, price_cents: 0, tracks: [] });
   const [editingCourse, setEditingCourse] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [selCourse, setSelCourse] = useState('');
@@ -153,7 +154,7 @@ export default function Admin() {
                     <td>{c.level}</td>
                     <td><span className={`badge ${c.published ? '' : 'warn'}`}>{c.published ? 'Published' : 'Draft'}</span></td>
                     <td>{c.enrollments ?? 'n/a'}</td>
-                    <td><button className="btn ghost small" onClick={() => { setEditingCourse(c.id); setCourse({title:c.title,description:c.description||'',image_url:c.image_url||'',level:c.level||'Beginner',is_paid:!!c.is_paid,price_cents:c.price_cents||0}); }}>Edit</button> <button className="btn ghost small" onClick={() => run(() => api(`/admin/courses/${c.id}`, { method: 'PATCH', body: { published: !c.published } }), 'Course updated.')}>{c.published ? 'Unpublish' : 'Publish'}</button></td>
+                    <td><button className="btn ghost small" onClick={() => { setEditingCourse(c.id); setCourse({title:c.title,description:c.description||'',image_url:c.image_url||'',level:c.level||'Beginner',is_paid:!!c.is_paid,price_cents:c.price_cents||0,tracks:Array.isArray(c.tracks)?c.tracks:(typeof c.tracks==='string'?(()=>{try{return JSON.parse(c.tracks)||[]}catch{return c.tracks.split(',').map((x)=>x.trim()).filter(Boolean)}})():[])}); }}>Edit</button> <button className="btn ghost small" onClick={() => run(() => api(`/admin/courses/${c.id}`, { method: 'PATCH', body: { published: !c.published } }), 'Course updated.')}>{c.published ? 'Unpublish' : 'Publish'}</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -172,6 +173,9 @@ export default function Admin() {
               <select className="input" value={course.level} onChange={(e) => setCourse({ ...course, level: e.target.value })}>
                 <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
               </select>
+              <fieldset className="card" style={{ padding: 12 }}><legend>Course tracks (none means all tracks)</legend>
+                {STUDY_TRACKS.map((group) => <div key={group.group}><strong>{group.group}</strong><div className="grid cols-3">{group.options.map((option) => <label key={option.value} className="small"><input type="checkbox" checked={course.tracks.includes(option.value)} onChange={(e) => setCourse((current) => ({ ...current, tracks: e.target.checked ? [...current.tracks, option.value] : current.tracks.filter((x) => x !== option.value) }))} /> {option.label}</label>)}</div></div>)}
+              </fieldset>
               <button className="btn teal" type="submit" disabled={uploadingImage}>{editingCourse ? 'Save course' : 'Add course'}</button>
               {editingCourse && <button className="btn ghost" type="button" onClick={() => { setEditingCourse(null); setCourse({title:'',description:'',image_url:'',level:'Beginner',is_paid:false,price_cents:0}); }}>Cancel edit</button>}
             </form>

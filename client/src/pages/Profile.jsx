@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
+import { TrackEditor } from '../components/StudyTracks.jsx';
 
 export default function Profile() {
   const [data, setData] = useState(null);
@@ -24,6 +25,12 @@ export default function Profile() {
             <span className="small">{c.progress.done}/{c.progress.total} subtopics</span>
           </Link>
         ))}
+      </section>
+
+      <section className="card mt">
+        <h2>Your study track</h2>
+        <p className="muted">Choose a track to personalize courses on your dashboard.</p>
+        <TrackEditor initialTrack={data.user.track} onSaved={(track) => setData((current) => ({ ...current, user: { ...current.user, track } }))} />
       </section>
 
       <section className="card mt">

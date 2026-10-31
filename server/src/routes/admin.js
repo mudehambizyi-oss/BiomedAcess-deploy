@@ -9,6 +9,14 @@ import { requireAdmin, requireContentManager } from '../lib/auth.js';
 import { bulkUpload, readUploadedText, parseBulkNotes, baseTitle } from '../lib/bulkNotes.js';
 
 const router = Router();
+const ALLOWED_TRACKS = new Set(['preclinical', 'clinical', 'examprep', 'practicing', 'labmanager', 'researcher']);
+const validateCourseTracks = (value) => {
+  if (value == null || value === '') return null;
+  const list = Array.isArray(value) ? value : (() => { try { return JSON.parse(value); } catch { return String(value).split(',').map((x) => x.trim()).filter(Boolean); } })();
+  if (!Array.isArray(list) || list.some((track) => !ALLOWED_TRACKS.has(track))) return false;
+  const unique = [...new Set(list)];
+  return unique.length ? JSON.stringify(unique) : null;
+};
 const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
 
 const imageTypes = new Map([['image/jpeg', '.jpg'], ['image/png', '.png'], ['image/webp', '.webp']]);
@@ -54,7 +62,9 @@ router.post('/courses', requireContentManager, async (req, res) => {
   const price = paid ? Math.max(0, parseInt(price_cents, 10) || 0) : 0;
   if (paid && price < 50) return res.status(400).json({ error: 'Paid courses need a price of at least 50 cents.' });
   const pos = (await db.get('SELECT COALESCE(MAX(position),0)+1 p FROM courses', [])).p;
-  const id = (await db.run('INSERT INTO courses (slug, title, description, image_url, level, discipline, is_paid, price_cents, currency, published, position) VALUES (?,?,?,?,?,?,?,?,?,?,?)', [slug, title.trim(), description, String(image_url || '').slice(0, 500), level, String(discipline || '').trim().slice(0, 60), paid, price, currency, published ? 1 : 0, pos])).lastInsertRowid;
+  const tracks = validateCourseTracks(req.body?.tracks);
+  if (tracks === false) return res.status(400).json({ error: 'Choose valid tracks.' });
+  const id = (await db.run('INSERT INTO courses (slug, title, description, image_url, level, discipline, is_paid, price_cents, currency, published, tracks, position) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', [slug, title.trim(), description, String(image_url || '').slice(0, 500), level, String(discipline || '').trim().slice(0, 60), paid, price, currency, published ? 1 : 0, tracks, pos])).lastInsertRowid;
   res.status(201).json({ id, slug });
 });
 
@@ -65,7 +75,9 @@ router.patch('/courses/:id', requireContentManager, async (req, res) => {
   const is_paid = b.is_paid !== undefined ? (b.is_paid ? 1 : 0) : c.is_paid;
   const price = b.price_cents !== undefined ? Math.max(0, parseInt(b.price_cents, 10) || 0) : c.price_cents;
   if (is_paid && price < 50) return res.status(400).json({ error: 'Paid courses need a price of at least 50 cents.' });
-  (await db.run('UPDATE courses SET title=?, description=?, image_url=?, level=?, discipline=?, is_paid=?, price_cents=?, published=? WHERE id=?', [b.title ?? c.title, b.description ?? c.description, b.image_url !== undefined ? String(b.image_url || '').slice(0, 500) : c.image_url, b.level ?? c.level, b.discipline !== undefined ? String(b.discipline || '').trim().slice(0, 60) : c.discipline, is_paid, is_paid ? price : 0, b.published !== undefined ? (b.published ? 1 : 0) : c.published, c.id]));
+  const trackUpdate = b.tracks !== undefined ? validateCourseTracks(b.tracks) : c.tracks;
+  if (trackUpdate === false) return res.status(400).json({ error: 'Choose valid tracks.' });
+  (await db.run('UPDATE courses SET title=?, description=?, image_url=?, level=?, discipline=?, is_paid=?, price_cents=?, published=?, tracks=? WHERE id=?', [b.title ?? c.title, b.description ?? c.description, b.image_url !== undefined ? String(b.image_url || '').slice(0, 500) : c.image_url, b.level ?? c.level, b.discipline !== undefined ? String(b.discipline || '').trim().slice(0, 60) : c.discipline, is_paid, is_paid ? price : 0, b.published !== undefined ? (b.published ? 1 : 0) : c.published, trackUpdate, c.id]));
   res.json({ ok: true });
 });
 

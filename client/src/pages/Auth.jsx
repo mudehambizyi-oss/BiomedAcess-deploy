@@ -150,7 +150,7 @@ export function Signup() {
     setError(''); setBusy(true);
     try {
       await signup(name, email, password);
-      navigate('/courses', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (err) { setError(err.message); } finally { setBusy(false); }
   }
 

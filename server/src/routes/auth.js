@@ -6,6 +6,14 @@ import db, { stmt } from '../db.js';
 import { signToken, requireAuth, JWT_SECRET } from '../lib/auth.js';
 
 const router = Router();
+const ALLOWED_TRACKS = new Set(['preclinical', 'clinical', 'examprep', 'practicing', 'labmanager', 'researcher']);
+
+router.post('/profile/track', requireAuth, async (req, res) => {
+  const track = req.body?.track == null || req.body?.track === '' ? null : String(req.body.track);
+  if (track !== null && !ALLOWED_TRACKS.has(track)) return res.status(400).json({ error: 'Choose a valid study track.' });
+  await db.run('UPDATE users SET track = ? WHERE id = ?', [track, req.user.id]);
+  res.json({ ok: true, track });
+});
 
 router.post('/signup', async (req, res) => {
   const email = String(req.body?.email || '').trim().toLowerCase();
@@ -17,7 +25,7 @@ router.post('/signup', async (req, res) => {
   if ((await db.get('SELECT 1 FROM users WHERE email = ?', [email]))) return res.status(409).json({ error: 'An account with this email already exists.' });
   const hash = bcrypt.hashSync(password, 10);
   const id = (await db.run('INSERT INTO users (email, password_hash, name, role) VALUES (?,?,?,?)', [email, hash, name, 'student'])).lastInsertRowid;
-  const user = (await db.get('SELECT id, email, name, role FROM users WHERE id = ?', [id]));
+  const user = (await db.get('SELECT id, email, name, role, track FROM users WHERE id = ?', [id]));
   res.status(201).json({ token: signToken(user), user });
 });
 
@@ -26,12 +34,13 @@ router.post('/login', async (req, res) => {
   const password = String(req.body?.password || '');
   const row = (await db.get('SELECT * FROM users WHERE email = ?', [email]));
   if (!row || !bcrypt.compareSync(password, row.password_hash)) return res.status(401).json({ error: 'Incorrect email or password.' });
-  const user = { id: row.id, email: row.email, name: row.name, role: row.role };
+  const user = { id: row.id, email: row.email, name: row.name, role: row.role, track: row.track ?? null };
   res.json({ token: signToken(user), user });
 });
 
-router.get('/me', requireAuth, (req, res) => {
-  res.json(req.user);
+router.get('/me', requireAuth, async (req, res) => {
+  const user = await db.get('SELECT id, email, name, role, track FROM users WHERE id = ?', [req.user.id]);
+  res.json(user);
 });
 
 

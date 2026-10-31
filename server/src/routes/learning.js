@@ -4,6 +4,11 @@ import { requireAuth, requireAdmin, optionalAuth } from '../lib/auth.js';
 import { courseAccess, topicCourse } from './courses.js';
 
 const router = Router();
+const parseTracks = (value) => {
+  if (!value) return [];
+  try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed : []; }
+  catch { return String(value).split(',').map((track) => track.trim()).filter(Boolean); }
+};
 
 // ---------- quizzes ----------
 // Student view: questions WITHOUT correct answers
@@ -103,9 +108,12 @@ router.get('/dashboard', requireAuth, async (req, res) => {
     FROM activity a JOIN topics t ON t.id = a.topic_id JOIN courses c ON c.id = t.course_id
     WHERE a.user_id = ? AND c.published = 1 ORDER BY a.last_accessed_at DESC LIMIT 5`, [uid]));
 
-  const recommended = (await db.all(`SELECT c.id, c.slug, c.title, c.description, c.level, c.is_paid, c.price_cents, c.currency FROM courses c
-    WHERE c.published = 1 AND c.id NOT IN (SELECT course_id FROM enrollments WHERE user_id = ?) ORDER BY c.position LIMIT 3`, [uid]))
-    .map((c) => ({ ...c, is_paid: !!c.is_paid }));
+  const recommended = (await db.all(`SELECT c.id, c.slug, c.title, c.description, c.level, c.is_paid, c.price_cents, c.currency, c.tracks FROM courses c
+    WHERE c.published = 1 AND c.id NOT IN (SELECT course_id FROM enrollments WHERE user_id = ?) ORDER BY c.position`, [uid]))
+    .map((c) => ({ ...c, is_paid: !!c.is_paid, track_targets: parseTracks(c.tracks) }));
+  const track = req.user.track || null;
+  const forTrack = recommended.filter((c) => !c.track_targets.length || (track && c.track_targets.includes(track)));
+  const otherCourses = recommended.filter((c) => !forTrack.includes(c));
 
   const acc = (await db.all(`SELECT t.id AS topic_id, t.title AS topic_title, c.title AS course_title, COUNT(aa.id) attempted, SUM(aa.is_correct) correct
     FROM attempt_answers aa JOIN quiz_attempts qa ON qa.id = aa.attempt_id JOIN topics t ON t.id = aa.topic_id JOIN courses c ON c.id = t.course_id
@@ -114,7 +122,7 @@ router.get('/dashboard', requireAuth, async (req, res) => {
 
   const quizzesTaken = (await db.get('SELECT COUNT(*) n FROM quiz_attempts WHERE user_id = ?', [uid])).n;
   res.json({
-    user: { id: uid, name: req.user.name },
+    user: { id: uid, name: req.user.name, track },
     summary: {
       enrolled_courses: enrolledWithProgress.length,
       subtopics_completed: totals.done,
@@ -124,7 +132,9 @@ router.get('/dashboard', requireAuth, async (req, res) => {
     },
     courses: enrolledWithProgress,
     recent_topics: recent,
-    recommended_courses: recommended,
+    recommended_courses: forTrack,
+    for_track_courses: forTrack,
+    other_courses: otherCourses,
     weak_areas: weak,
   });
 });
@@ -132,7 +142,7 @@ router.get('/dashboard', requireAuth, async (req, res) => {
 // ---------- profile ----------
 router.get('/profile', requireAuth, async (req, res) => {
   const uid = req.user.id;
-  const profile = (await db.get('SELECT id, name, email, role, created_at FROM users WHERE id = ?', [uid]));
+  const profile = (await db.get('SELECT id, name, email, role, track, created_at FROM users WHERE id = ?', [uid]));
   const courses = await Promise.all((await db.all(`SELECT c.id, c.slug, c.title, c.level, e.created_at AS enrolled_at FROM enrollments e JOIN courses c ON c.id = e.course_id WHERE e.user_id = ? ORDER BY e.created_at`, [uid])).map(async (c) => {
     const total = (await db.get('SELECT COUNT(*) n FROM subtopics s JOIN topics t ON t.id = s.topic_id WHERE t.course_id = ?', [c.id])).n;
     const done = (await db.get('SELECT COUNT(*) n FROM progress p JOIN subtopics s ON s.id = p.subtopic_id JOIN topics t ON t.id = s.topic_id WHERE t.course_id = ? AND p.user_id = ?', [c.id, uid])).n;
