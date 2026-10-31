@@ -13,6 +13,8 @@ export default function Admin() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [studentSort, setStudentSort] = useState('quiz');
   const [courses, setCourses] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState('');
@@ -26,11 +28,11 @@ export default function Admin() {
 
   const load = () => {
     const requests = user?.role === 'admin'
-      ? Promise.all([api('/admin/stats'), api('/admin/users'), api('/admin/courses'), api('/admin/analytics')])
-      : Promise.all([Promise.resolve(null), Promise.resolve([]), api('/admin/courses'), Promise.resolve(null)]);
-    return requests.then(async ([s, u, c, a]) => {
+      ? Promise.all([api('/admin/stats'), api('/admin/users'), api('/admin/courses'), api('/admin/analytics'), api('/admin/students')])
+      : Promise.all([Promise.resolve(null), Promise.resolve([]), api('/admin/courses'), Promise.resolve(null), Promise.resolve([])]);
+    return requests.then(async ([s, u, c, a, st]) => {
       const full = await Promise.all(c.map((x) => api(`/courses/${x.id}`).then((d) => ({ ...x, topics: d.topics })).catch(() => ({ ...x, topics: [] }))));
-      setStats(s); setUsers(u); setCourses(full); setAnalytics(a);
+      setStats(s); setUsers(u); setStudents(st); setCourses(full); setAnalytics(a);
     }).catch((e) => setError(e.message));
   };
   useEffect(() => { load(); }, [user?.role]);
@@ -74,6 +76,49 @@ export default function Admin() {
           <div className="card stat"><span className="small muted">Avg quiz score</span><strong>{stats.avg_score ?? 'n/a'}</strong></div>
         </div>
       )}
+
+      {user?.role === 'admin' && (() => {
+        const activeSince = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const activeCount = students.filter((s) => s.last_active && Date.parse(`${String(s.last_active).replace(' ', 'T')}Z`) >= activeSince).length;
+        const sorted = [...students].sort((a, b) => {
+          if (studentSort === 'active') return (Date.parse(`${String(b.last_active || '').replace(' ', 'T')}Z`) || 0) - (Date.parse(`${String(a.last_active || '').replace(' ', 'T')}Z`) || 0);
+          const field = studentSort === 'exam' ? 'exam_avg_percent' : 'quiz_avg_percent';
+          return (Number(b[field]) || -1) - (Number(a[field]) || -1);
+        });
+        const formatDate = (value) => value ? new Date(`${String(value).replace(' ', 'T')}Z`).toLocaleDateString() : 'Never';
+        const pct = (value) => value == null ? 'n/a' : `${value}%`;
+        return <section className="card" style={{ marginBottom: 16 }}>
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div><h2>Student performance</h2><p className="small muted">Quiz and exam results, course enrollment, and recent activity.</p></div>
+            <label className="small">Sort by{' '}
+              <select className="input small" value={studentSort} onChange={(e) => setStudentSort(e.target.value)}>
+                <option value="quiz">Quiz average</option><option value="exam">Exam average</option><option value="active">Last active</option>
+              </select>
+            </label>
+          </div>
+          <div className="grid cols-3 stat-row" style={{ margin: '12px 0 18px' }}>
+            <div className="card stat"><span className="small muted">Total students</span><strong>{students.length}</strong></div>
+            <div className="card stat"><span className="small muted">Active in last 7 days</span><strong>{activeCount}</strong></div>
+            <div className="card stat"><span className="small muted">Average quiz score</span><strong>{pct(stats?.avg_quiz_percent)}</strong></div>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="table small">
+              <thead><tr><th>Student</th><th>Courses</th><th>Quizzes</th><th>Quiz avg</th><th>Exams</th><th>Exam avg</th><th>Last active</th><th></th></tr></thead>
+              <tbody>
+                {sorted.map((s) => <tr key={s.id}>
+                  <td>{s.name}<div className="muted">{s.email}</div></td><td>{s.enrollments}</td><td>{s.quizzes_taken}</td><td>{pct(s.quiz_avg_percent)}</td><td>{s.exams_taken}</td><td>{pct(s.exam_avg_percent)}</td><td>{formatDate(s.last_active)}</td>
+                  <td><button className="btn ghost small" onClick={() => {
+                    if (window.confirm(`Delete ${s.name || s.email}'s student account and learning records? This cannot be undone.`)) {
+                      run(() => api(`/admin/users/${s.id}`, { method: 'DELETE' }), 'Student account deleted.');
+                    }
+                  }}>Remove</button></td>
+                </tr>)}
+                {!sorted.length && <tr><td colSpan="8" className="muted">No students yet.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </section>;
+      })()}
 
       <div className="split">
         <section className="stack">

@@ -109,11 +109,39 @@ router.put('/topics/:id/quiz', requireContentManager, async (req, res) => {
   res.json({ quiz_id: tx, question_count: questions.length });
 });
 
-// Students list (for admin visibility)
+// Per-student performance for the admin dashboard.
 router.get('/students', requireAdmin, async (_req, res) => {
-  res.json((await db.all(`SELECT u.id, u.name, u.email, u.created_at,
-    (SELECT COUNT(*) FROM enrollments e WHERE e.user_id = u.id) AS enrollments
-    FROM users u WHERE u.role = 'student' ORDER BY u.id DESC LIMIT 200`, [])));
+  res.json(await db.all(`SELECT u.id, u.name, u.email, u.created_at,
+    (SELECT COUNT(*) FROM enrollments e WHERE e.user_id = u.id) AS enrollments,
+    (SELECT COUNT(*) FROM quiz_attempts q WHERE q.user_id = u.id) AS quizzes_taken,
+    (SELECT ROUND(AVG(q.score * 100.0 / NULLIF(q.total, 0)), 1) FROM quiz_attempts q WHERE q.user_id = u.id) AS quiz_avg_percent,
+    (SELECT COUNT(*) FROM exam_attempts e WHERE e.user_id = u.id) AS exams_taken,
+    (SELECT ROUND(AVG(e.score * 100.0 / NULLIF(e.total, 0)), 1) FROM exam_attempts e WHERE e.user_id = u.id) AS exam_avg_percent,
+    (SELECT MAX(last_seen) FROM (
+      SELECT a.last_accessed_at AS last_seen FROM activity a WHERE a.user_id = u.id
+      UNION ALL SELECT q.created_at FROM quiz_attempts q WHERE q.user_id = u.id
+      UNION ALL SELECT e.created_at FROM exam_attempts e WHERE e.user_id = u.id
+      UNION ALL SELECT p.completed_at FROM progress p WHERE p.user_id = u.id
+    )) AS last_active
+    FROM users u WHERE u.role = 'student' ORDER BY u.id DESC`, []));
+});
+
+// Delete a student and their learning records. Admin accounts are never removable here.
+router.delete('/users/:id', requireAdmin, async (req, res) => {
+  const target = await db.get('SELECT id, role FROM users WHERE id = ?', [req.params.id]);
+  if (!target) return res.status(404).json({ error: 'User not found.' });
+  if (target.role === 'admin') return res.status(403).json({ error: 'Admin accounts cannot be deleted here.' });
+  if (target.role !== 'student') return res.status(403).json({ error: 'Only student accounts can be deleted here.' });
+
+  await db.tx(async () => {
+    await db.run('DELETE FROM attempt_answers WHERE attempt_id IN (SELECT id FROM quiz_attempts WHERE user_id = ?)', [target.id]);
+    await db.run('DELETE FROM exam_attempt_answers WHERE attempt_id IN (SELECT id FROM exam_attempts WHERE user_id = ?)', [target.id]);
+    await db.run('DELETE FROM quiz_attempts WHERE user_id = ?', [target.id]);
+    await db.run('DELETE FROM exam_attempts WHERE user_id = ?', [target.id]);
+    await db.run('DELETE FROM enrollments WHERE user_id = ?', [target.id]);
+    await db.run('DELETE FROM users WHERE id = ?', [target.id]);
+  });
+  res.json({ ok: true });
 });
 
 // Platform stats for the admin dashboard
@@ -127,6 +155,7 @@ router.get('/stats', requireAdmin, async (_req, res) => {
     quiz_attempts: (await one('SELECT COUNT(*) AS n FROM quiz_attempts')).n,
     enrollments: (await one('SELECT COUNT(*) AS n FROM enrollments')).n,
     avg_score: (await one('SELECT ROUND(AVG(score),1) AS v FROM quiz_attempts')).v,
+    avg_quiz_percent: (await one('SELECT ROUND(AVG(score * 100.0 / NULLIF(total, 0)),1) AS v FROM quiz_attempts')).v,
   });
 });
 
