@@ -7,6 +7,7 @@ import { BookmarkButton } from '../components/Features.jsx';
 import CourseMaterials from '../components/Materials.jsx';
 import { CertificateCard } from '../components/Certificates.jsx';
 import { ManualUnlockPanel } from '../components/ManualUnlock.jsx';
+import RichText from '../components/RichText.jsx';
 
 export default function CourseDetail() {
   const { id } = useParams();
@@ -68,11 +69,12 @@ export default function CourseDetail() {
     <div className="container">
       <div className="breadcrumb"><Link to="/courses">Courses</Link> / {course.title}</div>
       <div className="card hero-card">
+        {course.image_url && <img className="course-cover" src={course.image_url} alt={`${course.title} cover`} loading="lazy" />}
         <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <span className="badge">{course.level}</span>
             <h1 style={{ marginTop: 10 }}>{course.title} <BookmarkButton kind="course" id={course.id} /></h1>
-            <p className="muted" style={{ maxWidth: 640 }}>{course.description}</p>
+            <div className="course-description"><RichText text={course.description} /></div>
             <p className="small muted">{course.topics.length} topics, {totalSub} subtopics</p>
           </div>
           <div className="cta-box">

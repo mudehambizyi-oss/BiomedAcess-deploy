@@ -1,10 +1,44 @@
 import { Router } from 'express';
+import multer from 'multer';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import db, { stmt } from '../db.js';
+import { UPLOAD_DIR } from '../db.js';
 import { requireAdmin, requireContentManager } from '../lib/auth.js';
 import { bulkUpload, readUploadedText, parseBulkNotes, baseTitle } from '../lib/bulkNotes.js';
 
 const router = Router();
 const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
+
+const imageTypes = new Map([['image/jpeg', '.jpg'], ['image/png', '.png'], ['image/webp', '.webp']]);
+const imageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => imageTypes.has(file.mimetype) ? cb(null, true) : cb(new Error('Upload a JPG, PNG or WEBP image.')),
+}).single('file');
+router.post('/uploads/image', requireAdmin, (req, res, next) => imageUpload(req, res, (err) => {
+  if (err) return res.status(400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'Image must be 5 MB or smaller.' : err.message });
+  next();
+}), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Choose an image to upload.' });
+  const ext = imageTypes.get(req.file.mimetype);
+  const filename = `${crypto.randomBytes(16).toString('hex')}${ext}`;
+  const target = path.join(UPLOAD_DIR, filename);
+  try {
+    // Check actual file signatures, not only the browser-supplied MIME type.
+    const b = req.file.buffer;
+    const valid = req.file.mimetype === 'image/jpeg' ? b[0] === 0xff && b[1] === 0xd8
+      : req.file.mimetype === 'image/png' ? b.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]))
+        : b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WEBP';
+    if (!valid) return res.status(400).json({ error: 'The file does not match its image type.' });
+    await fs.promises.writeFile(target, b, { flag: 'wx' });
+    res.status(201).json({ url: `/uploads/${filename}` });
+  } catch (e) {
+    await fs.promises.rm(target, { force: true }).catch(() => {});
+    res.status(500).json({ error: 'Image could not be stored.' });
+  }
+});
 
 // Courses and learning content can be managed by moderators and admins.
 router.get('/courses', requireContentManager, async (_req, res) => {
@@ -12,7 +46,7 @@ router.get('/courses', requireContentManager, async (_req, res) => {
 });
 
 router.post('/courses', requireContentManager, async (req, res) => {
-  const { title, description = '', level = 'Beginner', discipline = '', is_paid = false, price_cents = 0, currency = 'usd', published = true } = req.body || {};
+  const { title, description = '', image_url = '', level = 'Beginner', discipline = '', is_paid = false, price_cents = 0, currency = 'usd', published = true } = req.body || {};
   if (!String(title || '').trim()) return res.status(400).json({ error: 'Course title is required.' });
   let slug = slugify(title);
   if ((await db.get('SELECT 1 FROM courses WHERE slug = ?', [slug]))) slug = `${slug}-${Date.now().toString(36)}`;
@@ -20,7 +54,7 @@ router.post('/courses', requireContentManager, async (req, res) => {
   const price = paid ? Math.max(0, parseInt(price_cents, 10) || 0) : 0;
   if (paid && price < 50) return res.status(400).json({ error: 'Paid courses need a price of at least 50 cents.' });
   const pos = (await db.get('SELECT COALESCE(MAX(position),0)+1 p FROM courses', [])).p;
-  const id = (await db.run('INSERT INTO courses (slug, title, description, level, discipline, is_paid, price_cents, currency, published, position) VALUES (?,?,?,?,?,?,?,?,?,?)', [slug, title.trim(), description, level, String(discipline || '').trim().slice(0, 60), paid, price, currency, published ? 1 : 0, pos])).lastInsertRowid;
+  const id = (await db.run('INSERT INTO courses (slug, title, description, image_url, level, discipline, is_paid, price_cents, currency, published, position) VALUES (?,?,?,?,?,?,?,?,?,?,?)', [slug, title.trim(), description, String(image_url || '').slice(0, 500), level, String(discipline || '').trim().slice(0, 60), paid, price, currency, published ? 1 : 0, pos])).lastInsertRowid;
   res.status(201).json({ id, slug });
 });
 
@@ -31,7 +65,7 @@ router.patch('/courses/:id', requireContentManager, async (req, res) => {
   const is_paid = b.is_paid !== undefined ? (b.is_paid ? 1 : 0) : c.is_paid;
   const price = b.price_cents !== undefined ? Math.max(0, parseInt(b.price_cents, 10) || 0) : c.price_cents;
   if (is_paid && price < 50) return res.status(400).json({ error: 'Paid courses need a price of at least 50 cents.' });
-  (await db.run('UPDATE courses SET title=?, description=?, level=?, discipline=?, is_paid=?, price_cents=?, published=? WHERE id=?', [b.title ?? c.title, b.description ?? c.description, b.level ?? c.level, b.discipline !== undefined ? String(b.discipline || '').trim().slice(0, 60) : c.discipline, is_paid, is_paid ? price : 0, b.published !== undefined ? (b.published ? 1 : 0) : c.published, c.id]));
+  (await db.run('UPDATE courses SET title=?, description=?, image_url=?, level=?, discipline=?, is_paid=?, price_cents=?, published=? WHERE id=?', [b.title ?? c.title, b.description ?? c.description, b.image_url !== undefined ? String(b.image_url || '').slice(0, 500) : c.image_url, b.level ?? c.level, b.discipline !== undefined ? String(b.discipline || '').trim().slice(0, 60) : c.discipline, is_paid, is_paid ? price : 0, b.published !== undefined ? (b.published ? 1 : 0) : c.published, c.id]));
   res.json({ ok: true });
 });
 

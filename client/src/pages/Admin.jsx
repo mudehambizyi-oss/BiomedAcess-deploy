@@ -19,7 +19,9 @@ export default function Admin() {
   const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
-  const [course, setCourse] = useState({ title: '', description: '', level: 'Beginner', is_paid: false, price_cents: 0 });
+  const [course, setCourse] = useState({ title: '', description: '', image_url: '', level: 'Beginner', is_paid: false, price_cents: 0 });
+  const [editingCourse, setEditingCourse] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [selCourse, setSelCourse] = useState('');
   const [topic, setTopic] = useState({ title: '' });
   const [sub, setSub] = useState({ topic_id: '', title: '', content: '' });
@@ -40,6 +42,24 @@ export default function Admin() {
   const run = async (fn, ok) => {
     setError(''); setMsg('');
     try { await fn(); setMsg(ok); load(); } catch (e) { setError(e.message); }
+  };
+
+  const uploadImage = async (file) => {
+    if (!file) return '';
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('choose a jpg, png or webp image');
+    if (file.size > 5 * 1024 * 1024) throw new Error('image must be 5 mb or smaller');
+    const form = new FormData(); form.append('file', file);
+    return (await api('/admin/uploads/image', { method: 'POST', form })).url;
+  };
+  const addInlineImage = async (field, setField, input) => {
+    const file = input.files?.[0]; input.value = '';
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const url = await uploadImage(file);
+      setField((prev) => ({ ...prev, [field]: `${prev[field] || ''}${prev[field] && !prev[field].endsWith('\\n') ? '\\n' : ''}[img]${url}\\n` }));
+      setError('');
+    } catch (e) { setError(e.message); } finally { setUploadingImage(false); }
   };
 
   const topics = courses.flatMap((c) => (c.topics || []).map((t) => ({ ...t, course: c.title })));
@@ -129,22 +149,31 @@ export default function Admin() {
               <tbody>
                 {courses.map((c) => (
                   <tr key={c.id}>
-                    <td><Link to={`/courses/${c.id}`}>{c.title}</Link></td>
+                    <td><Link to={`/courses/${c.id}`}>{c.title}</Link>{c.image_url && <img src={c.image_url} alt="" style={{display:'block',width:70,height:44,objectFit:'cover',borderRadius:5,marginTop:4}} />}</td>
                     <td>{c.level}</td>
                     <td><span className={`badge ${c.published ? '' : 'warn'}`}>{c.published ? 'Published' : 'Draft'}</span></td>
                     <td>{c.enrollments ?? 'n/a'}</td>
-                    <td><button className="btn ghost small" onClick={() => run(() => api(`/admin/courses/${c.id}`, { method: 'PATCH', body: { published: !c.published } }), 'Course updated.')}>{c.published ? 'Unpublish' : 'Publish'}</button></td>
+                    <td><button className="btn ghost small" onClick={() => { setEditingCourse(c.id); setCourse({title:c.title,description:c.description||'',image_url:c.image_url||'',level:c.level||'Beginner',is_paid:!!c.is_paid,price_cents:c.price_cents||0}); }}>Edit</button> <button className="btn ghost small" onClick={() => run(() => api(`/admin/courses/${c.id}`, { method: 'PATCH', body: { published: !c.published } }), 'Course updated.')}>{c.published ? 'Unpublish' : 'Publish'}</button></td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <form className="form-inline" onSubmit={(e) => { e.preventDefault(); run(() => api('/admin/courses', { method: 'POST', body: course }), 'Course created.'); }}>
+            <form className="form-inline" onSubmit={(e) => { e.preventDefault(); run(() => api(editingCourse ? `/admin/courses/${editingCourse}` : '/admin/courses', { method: editingCourse ? 'PATCH' : 'POST', body: course }), editingCourse ? 'Course updated.' : 'Course created.'); }}>
               <input className="input" placeholder="Course title" required value={course.title} onChange={(e) => setCourse({ ...course, title: e.target.value })} />
-              <input className="input" placeholder="Description" value={course.description} onChange={(e) => setCourse({ ...course, description: e.target.value })} />
+              <textarea className="input" placeholder="Description" value={course.description} onChange={(e) => setCourse({ ...course, description: e.target.value })} />
+              <input className="input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Course cover image" onChange={async (e) => {
+                const file = e.target.files?.[0]; if (!file) return;
+                setUploadingImage(true);
+                try { const url = await uploadImage(file); setCourse((c) => ({ ...c, image_url: url })); setError(''); }
+                catch (err) { setError(err.message); }
+                finally { setUploadingImage(false); e.target.value = ''; }
+              }} />
+              {course.image_url && <img src={course.image_url} alt="Course cover preview" style={{ width: 160, height: 90, objectFit: 'cover', borderRadius: 8 }} />}
               <select className="input" value={course.level} onChange={(e) => setCourse({ ...course, level: e.target.value })}>
                 <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
               </select>
-              <button className="btn teal" type="submit">Add course</button>
+              <button className="btn teal" type="submit" disabled={uploadingImage}>{editingCourse ? 'Save course' : 'Add course'}</button>
+              {editingCourse && <button className="btn ghost" type="button" onClick={() => { setEditingCourse(null); setCourse({title:'',description:'',image_url:'',level:'Beginner',is_paid:false,price_cents:0}); }}>Cancel edit</button>}
             </form>
           </div>
 
@@ -166,6 +195,8 @@ export default function Admin() {
                 {topics.map((t) => <option key={t.id} value={t.id}>{t.course}: {t.title}</option>)}
               </select>
               <input className="input" placeholder="Subtopic title" required value={sub.title} onChange={(e) => setSub({ ...sub, title: e.target.value })} />
+              <textarea className="input" rows={5} placeholder="Subtopic description. Use Add image to insert a photo." value={sub.content} onChange={(e) => setSub({ ...sub, content: e.target.value })} />
+              <label className="btn ghost small">Add image<input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => addInlineImage('content', setSub, e.target)} /></label>
               <button className="btn ghost" type="submit">Add subtopic</button>
             </form>
           </div>

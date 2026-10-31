@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { api, downloadResource, downloadSubtopicPdf, downloadTopicPdf } from '../api.js';
+import RichText from '../components/RichText.jsx';
 
 function Comments({ resourceId }) {
   const [list, setList] = useState([]);
@@ -109,7 +110,7 @@ export default function TopicPage() {
 
       <article className="reader">
         <h1 className="reader-title">{sub.title}</h1>
-        <div className="reader-body">{sub.body || 'This section has no text yet.'}</div>
+        <div className="reader-body"><RichText text={sub.body || 'This section has no text yet.'} /></div>
       </article>
 
       <div className="reader-foot card">

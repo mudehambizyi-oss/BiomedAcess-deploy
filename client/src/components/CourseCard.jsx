@@ -13,6 +13,7 @@ export default function CourseCard({ course }) {
         {course.discipline && <span className="badge discipline">{course.discipline}</span>}
         {course.is_paid ? <span className="badge paid">{formatPrice(course.price_cents, course.currency)}</span> : <span className="badge teal">Free</span>}
       </div>
+      {course.image_url && <img className="course-cover" src={course.image_url} alt={`${course.title} cover`} loading="lazy" />}
       <h3>{course.title}</h3>
       <p className="muted small" style={{ margin: 0 }}>{course.description}</p>
       <div className="foot">

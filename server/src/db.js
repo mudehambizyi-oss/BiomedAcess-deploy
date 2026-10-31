@@ -173,6 +173,7 @@ CREATE TABLE IF NOT EXISTS courses (
   slug TEXT UNIQUE NOT NULL,
   title TEXT NOT NULL,
   description TEXT NOT NULL DEFAULT '',
+  image_url TEXT NOT NULL DEFAULT '',
   level TEXT NOT NULL DEFAULT 'Beginner',
   is_paid INTEGER NOT NULL DEFAULT 0,
   price_cents INTEGER NOT NULL DEFAULT 0,
@@ -394,6 +395,10 @@ await db.exec(`CREATE TABLE IF NOT EXISTS exam_attempt_answers (
   is_correct INTEGER,
   PRIMARY KEY (attempt_id, question_id)
 );`);
+
+if (!(await db.get("SELECT 1 AS x FROM pragma_table_info('courses') WHERE name = 'image_url'"))) {
+  await db.exec("ALTER TABLE courses ADD COLUMN image_url TEXT NOT NULL DEFAULT ''");
+}
 
 // Optional small image data for community and case-study cards. Base64 data stays portable on Render free tier.
 for (const [table, column] of [['communities', 'image_data'], ['case_studies', 'image_data']]) {

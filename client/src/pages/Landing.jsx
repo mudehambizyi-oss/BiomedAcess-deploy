@@ -309,6 +309,7 @@ export default function Landing() {
                       ? <span className="badge paid">Paid</span>
                       : <span className="badge teal">Free</span>}
                   </div>
+                  {c.image_url && <img className="lp-course-cover" src={c.image_url} alt={`${c.title} cover`} loading="lazy" />}
                   <h3>{c.title}</h3>
                   {c.discipline && <span className="lp-course-disc">{c.discipline}</span>}
                   <p className="muted small">{c.description}</p>
