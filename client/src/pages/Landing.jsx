@@ -380,17 +380,13 @@ export default function Landing() {
         <Reveal className="lp-head"><span className="lp-eyebrow">Learning proof</span><h2>Build skills you can show</h2></Reveal>
         <div className="lp-proof-grid">
           <Reveal className="card lp-certificate">
-            <svg className="lp-certificate-art" viewBox="0 0 800 520" role="img" aria-label="Sample BiomedAccess course certificate">
-              <rect x="12" y="12" width="776" height="496" rx="8" fill="#f8fafc" stroke="#10b981" strokeWidth="12" />
-              <rect x="36" y="36" width="728" height="448" rx="4" fill="none" stroke="#e07b39" strokeWidth="2" />
-              <text x="400" y="120" textAnchor="middle" fill="#064e3b" fontSize="38" fontFamily="Georgia,serif">BiomedAccess</text>
-              <text x="400" y="182" textAnchor="middle" fill="#334155" fontSize="24" fontFamily="Arial">CERTIFICATE OF COMPLETION</text>
-              <text x="400" y="258" textAnchor="middle" fill="#0f172a" fontSize="32" fontFamily="Georgia,serif">Sample Learner</text>
-              <text x="400" y="310" textAnchor="middle" fill="#475569" fontSize="19" fontFamily="Arial">has completed a course in Biomedical Laboratory Science</text>
-              <path d="M310 386h180" stroke="#10b981" strokeWidth="3" />
-              <text x="400" y="418" textAnchor="middle" fill="#64748b" fontSize="16" fontFamily="Arial">SAMPLE CERTIFICATE · NOT A REAL AWARD</text>
-            </svg>
-            <p className="muted small">Sample certificate design. Actual certificates are issued after course completion.</p>
+            <div className="lp-certificate-art" aria-hidden="true">
+              <div className="lp-certificate-brand">BiomedAccess</div>
+              <div className="lp-certificate-label">CERTIFICATE OF COMPLETION</div>
+              <div className="lp-certificate-complete">Course completion award</div>
+            </div>
+            <h3>Earn verifiable certificates</h3>
+            <p>Finish every topic in a course to unlock a downloadable PDF with a unique ID employers can verify. <Link to="/signup">Start learning</Link></p>
           </Reveal>
           <Reveal className="lp-testimonials">
             <h3>What our students say</h3>

@@ -569,14 +569,18 @@
 .catalog-filters { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
 .lp-proof-grid { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:24px; align-items:start; }
 .lp-certificate { padding:18px; }
-.lp-certificate-art { display:block; width:100%; height:auto; border-radius:6px; }
+.lp-certificate-art { display:flex; min-height:180px; padding:22px; border:1px solid rgba(16,185,129,.7); border-radius:6px; background:linear-gradient(145deg,#0d1714,#13211c); flex-direction:column; justify-content:space-between; text-align:center; box-shadow:inset 0 0 0 5px rgba(224,123,57,.18); }
+.lp-certificate-brand { padding:10px; background:#10b981; color:#06251b; font-size:1.25rem; font-weight:800; letter-spacing:.03em; }
+.lp-certificate-label { margin:24px 0 8px; color:#e8f1ee; font-size:.82rem; font-weight:800; letter-spacing:.12em; }
+.lp-certificate-complete { color:#e07b39; font-size:.92rem; font-weight:700; }
 .lp-testimonials h3 { margin-top:0; }
 .lp-quote { margin:12px 0; padding:16px; }
 .lp-quote cite { display:block; margin-top:10px; font-size:.8rem; color:#94a3b8; font-style:normal; }
 .lp-partnerships { padding:20px 16px; border-top:1px solid rgba(16,185,129,.18); border-bottom:1px solid rgba(16,185,129,.18); }
 .lp-partnerships .lp-head { max-width:900px; margin:auto; text-align:center; }
-@media (max-width:700px) { .lp-proof-grid { grid-template-columns:1fr; } .lp-secondary-cta { gap:12px; } }
-
+@media (max-width:700px) {
+  .lp-proof-grid { grid-template-columns:1fr; }
+  .lp-secondary-cta { gap:12px; }
   .lp-hero { min-height: 0; margin: 4px -16px 0; border-radius: 0 0 16px 16px; }
   .lp-hero-inner { padding: 56px 18px 110px; }
   .lp-hero::before {

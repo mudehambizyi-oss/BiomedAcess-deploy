@@ -2,8 +2,9 @@
 // No dependencies: raw PDF 1.4 with vector shapes and standard Helvetica fonts.
 // Palette: dark background, green #10b981 and orange #e07b39 accents.
 
-const PAGE_W = 842;
-const PAGE_H = 595;
+// A4 portrait, in PDF points.
+const PAGE_W = 595.28;
+const PAGE_H = 841.89;
 
 function rgb(hex) {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -45,23 +46,24 @@ export function buildCertificatePdf({ certId, studentName, courseTitle, issuedDa
   fill(ORANGE); rect(PAGE_W - 194, PAGE_H - 92, 140, 4);
 
   // branding
-  text('BiomedAccess', PAGE_W / 2, PAGE_H - 130, 30, { bold: true, color: GREEN, center: true });
-  text('PROFESSIONAL DIGITAL RESIDENCY  |  BUILT FOR THE LABORATORY SCIENTIST', PAGE_W / 2, PAGE_H - 152, 10, { color: MUTED, center: true });
+  fill(GREEN); rect(0, PAGE_H - 112, PAGE_W, 112);
+  text('BiomedAccess', PAGE_W / 2, PAGE_H - 62, 30, { bold: true, color: '#ffffff', center: true });
+  text('Built for the Laboratory Scientist', PAGE_W / 2, PAGE_H - 84, 12, { color: '#ffffff', center: true });
 
-  text('CERTIFICATE OF COMPLETION', PAGE_W / 2, PAGE_H - 210, 26, { bold: true, color: TEXT, center: true });
-  text('This certifies that', PAGE_W / 2, PAGE_H - 250, 14, { italic: true, color: MUTED, center: true });
-  text(studentName, PAGE_W / 2, PAGE_H - 292, 34, { bold: true, color: ORANGE, center: true });
-  fill(GREEN); rect(PAGE_W / 2 - 180, PAGE_H - 306, 360, 1.5);
-  text('has successfully completed every topic of the course', PAGE_W / 2, PAGE_H - 340, 14, { italic: true, color: MUTED, center: true });
-  text(courseTitle, PAGE_W / 2, PAGE_H - 378, 22, { bold: true, color: GREEN, center: true });
+  text('CERTIFICATE OF COMPLETION', PAGE_W / 2, PAGE_H - 220, 22, { bold: true, color: TEXT, center: true });
+  text('This certifies that', PAGE_W / 2, PAGE_H - 278, 14, { italic: true, color: MUTED, center: true });
+  text(studentName, PAGE_W / 2, PAGE_H - 330, 30, { bold: true, color: ORANGE, center: true });
+  fill(GREEN); rect(PAGE_W / 2 - 180, PAGE_H - 346, 360, 1.5);
+  text('has successfully completed every topic of the course', PAGE_W / 2, PAGE_H - 386, 13, { italic: true, color: MUTED, center: true });
+  text(courseTitle, PAGE_W / 2, PAGE_H - 432, 19, { bold: true, color: GREEN, center: true });
 
-  // footer details
-  text(`Date issued: ${issuedDate}`, 90, 120, 12, { color: TEXT });
-  text(`Certificate ID: ${certId}`, 90, 100, 12, { bold: true, color: ORANGE });
-  text(`Verify at: ${verifyUrl}`, 90, 80, 10, { color: MUTED });
-  fill(ORANGE); rect(PAGE_W - 290, 118, 200, 1.2);
-  text('BiomedAccess', PAGE_W - 190, 98, 12, { bold: true, color: TEXT, center: true });
-  text('Authorised issuer', PAGE_W - 190, 82, 9, { color: MUTED, center: true });
+  // founder signature and issue details
+  fill(ORANGE); rect(PAGE_W / 2 - 106, 184, 212, 1.2);
+  text('Bizyi Mudehambi, Founder', PAGE_W / 2, 164, 12, { bold: true, color: TEXT, center: true });
+  text('Authorised issuer', PAGE_W / 2, 146, 9, { color: MUTED, center: true });
+  text(`Date completed: ${issuedDate}`, 76, 108, 11, { color: TEXT });
+  text(`Certificate ID: ${certId}`, 76, 88, 11, { bold: true, color: ORANGE });
+  text(`Verify at: ${verifyUrl}`, 76, 68, 8, { color: MUTED });
 
   const stream = ops.join('\n');
   const objects = [];
