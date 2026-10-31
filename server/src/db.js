@@ -293,6 +293,14 @@ CREATE TABLE IF NOT EXISTS announcements (
   created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS testimonials (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  quote TEXT NOT NULL,
+  name TEXT NOT NULL,
+  role TEXT NOT NULL,
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 CREATE TABLE IF NOT EXISTS exams (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
@@ -318,7 +326,19 @@ CREATE TABLE IF NOT EXISTS payments (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `;
+const hadTestimonialsTable = !!(await db.get("SELECT 1 AS x FROM sqlite_master WHERE type = 'table' AND name = 'testimonials'"));
 await db.exec(SCHEMA);
+if (!hadTestimonialsTable) {
+  const examples = [
+    ['The topic quizzes help me revise between shifts.', 'Example quote', 'Zambian laboratory technologist'],
+    ['I can revisit core science at my own pace.', 'Example quote', 'Medical laboratory science student'],
+    ['The case discussions connect lessons to bench work.', 'Example quote', 'Zambian clinical laboratory scientist'],
+  ];
+  for (let position = 0; position < examples.length; position++) {
+    const [quote, name, role] = examples[position];
+    await db.run('INSERT INTO testimonials (quote, name, role, position) VALUES (?, ?, ?, ?)', [quote, name, role, position]);
+  }
+}
 
 // Add track fields to existing databases before any table rebuilds.
 if (!(await db.get("SELECT 1 AS x FROM pragma_table_info('users') WHERE name = 'track'"))) {

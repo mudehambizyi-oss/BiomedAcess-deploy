@@ -7,6 +7,7 @@ import Announcements from '../components/Announcements.jsx';
 import { AdminPayments } from '../components/ManualUnlock.jsx';
 import InstantNotesUpload from '../components/InstantNotesUpload.jsx';
 import AdminContent from '../components/AdminContent.jsx';
+import AdminTestimonials from '../components/AdminTestimonials.jsx';
 import { AdminPhase3 } from './Phase3.jsx';
 import { STUDY_TRACKS, TRACK_VALUES } from '../components/StudyTracks.jsx';
 
@@ -85,7 +86,7 @@ export default function Admin() {
             <button className={`btn small ${tab === 'content' ? 'teal' : 'ghost'}`} onClick={() => setTab('content')}>Communities, cases & contact</button>
           </div>
           {tab === 'payments' && <AdminPayments />}
-          {tab === 'content' && <><AdminContent /><AdminPhase3 /></>}
+          {tab === 'content' && <><AdminContent /><AdminPhase3 /><AdminTestimonials /></>}
         </>}
 
       {(user?.role !== 'admin' || tab === 'overview') && <>

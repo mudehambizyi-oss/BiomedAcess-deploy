@@ -167,8 +167,10 @@ export default function Landing() {
   const { user } = useAuth();
   const [courses, setCourses] = useState(null);
   const [stats, setStats] = useState(null);
+  const [testimonials, setTestimonials] = useState([]);
   useEffect(() => { api('/courses').then((c) => setCourses(Array.isArray(c) ? c : [])).catch(() => setCourses([])); }, []);
   useEffect(() => { api('/stats').then(setStats).catch(() => {}); }, []);
+  useEffect(() => { api('/testimonials').then((items) => setTestimonials(Array.isArray(items) ? items : [])).catch(() => setTestimonials([])); }, []);
 
   const previewCourses = (courses || []).slice(0, 8);
   const statItems = stats ? [
@@ -388,13 +390,12 @@ export default function Landing() {
             <h3>Earn verifiable certificates</h3>
             <p>Finish every topic in a course to unlock a downloadable PDF with a unique ID employers can verify. <Link to="/signup">Start learning</Link></p>
           </Reveal>
-          <Reveal className="lp-testimonials">
+          {testimonials.length > 0 && <Reveal className="lp-testimonials">
             <h3>What our students say</h3>
-            <p className="muted small">Example quotes, created to illustrate the experience.</p>
-            <blockquote className="card lp-quote">“The topic quizzes help me revise between shifts.”<cite>Example quote · Zambian laboratory technologist</cite></blockquote>
-            <blockquote className="card lp-quote">“I can revisit core science at my own pace.”<cite>Example quote · Medical laboratory science student</cite></blockquote>
-            <blockquote className="card lp-quote">“The case discussions connect lessons to bench work.”<cite>Example quote · Zambian clinical laboratory scientist</cite></blockquote>
-          </Reveal>
+            {testimonials.map((testimonial) => (
+              <blockquote key={testimonial.id} className="card lp-quote">“{testimonial.quote}”<cite>{testimonial.name} · {testimonial.role}</cite></blockquote>
+            ))}
+          </Reveal>}
         </div>
       </section>
 
