@@ -46,6 +46,17 @@ app.use(express.json({ limit: '1mb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, name: 'BiomedAccess API' }));
 
+// Public, live content counts for the landing page.
+app.get('/api/stats', async (_req, res) => {
+  const [courses, topics, cases, jobs] = await Promise.all([
+    db.get('SELECT COUNT(*) AS n FROM courses WHERE published = 1'),
+    db.get('SELECT COUNT(*) AS n FROM topics t JOIN courses c ON c.id = t.course_id WHERE c.published = 1'),
+    db.get('SELECT COUNT(*) AS n FROM case_studies WHERE published = 1'),
+    db.get('SELECT COUNT(*) AS n FROM jobs'),
+  ]);
+  res.json({ courses: courses.n, topics: topics.n, case_studies: cases.n, jobs: jobs.n, communities: 1 });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api', courseRoutes);
 app.use('/api', resourceRoutes);

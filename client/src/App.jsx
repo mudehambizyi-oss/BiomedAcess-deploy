@@ -5,6 +5,7 @@ import { applyTheme, getStoredTheme, storeTheme } from './lib/theme.js';
 import { ClinicalCases, ClinicalCasePlayer, Careers } from './pages/Phase3.jsx';
 import Landing from './pages/Landing.jsx';
 import { Login, Signup } from './pages/Auth.jsx';
+import Practice from './pages/Practice.jsx';
 import Courses from './pages/Courses.jsx';
 import CourseDetail from './pages/CourseDetail.jsx';
 import TopicPage from './pages/TopicPage.jsx';
@@ -94,28 +95,17 @@ function Nav() {
         <Link to={user ? '/dashboard' : '/'} className="brand">
           <img src="/images/logo.jpg" alt="BiomedAccess" style={{ width: 34, height: 34, borderRadius: 8, objectFit: 'cover' }} /> BiomedAccess
         </Link>
-        <nav className="nav">
+        <nav className="nav" aria-label="Main navigation">
           <NavLink to="/courses">Courses</NavLink>
-          {user && <NavLink to={['admin', 'moderator', 'tutor'].includes(user.role) ? '/admin' : '/dashboard'}>{user.role === 'admin' ? 'Admin' : user.role === 'moderator' ? 'Moderator' : user.role === 'tutor' ? 'Tutor' : 'Dashboard'}</NavLink>}
-          {user && <NavLink to="/communities">Communities</NavLink>}
+          <NavLink to="/practice">Quizzes &amp; Exams</NavLink>
+          <NavLink to="/cases">Clinical cases</NavLink>
           <NavLink to="/careers">Careers</NavLink>
-          {user && <NavLink to="/cases">Case studies</NavLink>}
-          {user && !['tutor'].includes(user.role) && <NavLink to="/analytics">Analytics</NavLink>}
-          {user && <NavLink to="/profile">Profile</NavLink>}
+          <a href="https://t.me/biomedaccess" target="_blank" rel="noopener noreferrer">Telegram</a>
+          {user && <NavLink to={['admin', 'moderator', 'tutor'].includes(user.role) ? '/admin' : '/dashboard'}>{user.role === 'admin' ? 'Admin' : user.role === 'moderator' ? 'Moderator' : user.role === 'tutor' ? 'Tutor' : 'Dashboard'}</NavLink>}
           <span className="spacer" />
           <SearchBar />
           <ThemeToggle />
-          {user ? (
-            <>
-              <span className="nav-user">{user.name}</span>
-              <button className="btn light small" onClick={logout}>Log out</button>
-            </>
-          ) : (
-            <>
-              <NavLink to="/login">Log in</NavLink>
-              <Link to="/signup" className="btn teal small">Sign up free</Link>
-            </>
-          )}
+          {user ? <><span className="nav-user">{user.name}</span><button className="btn light small" onClick={logout}>Log out</button></> : <><NavLink to="/login">Log in</NavLink><Link to="/signup" className="btn teal small">Sign up free</Link></>}
         </nav>
       </div>
     </header>
@@ -131,6 +121,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/courses" element={<Courses />} />
+        <Route path="/practice" element={<Practice />} />
         <Route path="/courses/:id" element={<CourseDetail />} />
         <Route path="/topics/:id" element={<RequireAuth><TopicPage /></RequireAuth>} />
         <Route path="/topics/:id/sub/:subId" element={<RequireAuth><TopicPage /></RequireAuth>} />

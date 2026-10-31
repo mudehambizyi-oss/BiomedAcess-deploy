@@ -54,6 +54,7 @@ export default function Announcements({ admin = false }) {
           <div key={a.id} className="card ann-item" style={{ borderLeft: a.pinned ? '3px solid #e07b39' : undefined }}>
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <strong>{a.pinned ? '📌 ' : ''}{a.title}</strong>
+              <time className="muted small" dateTime={a.created_at}>{new Date(a.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</time>
               {admin && (
                 <span className="row">
                   <button className="btn ghost small" type="button" onClick={() => togglePin(a)}>{a.pinned ? 'Unpin' : 'Pin'}</button>

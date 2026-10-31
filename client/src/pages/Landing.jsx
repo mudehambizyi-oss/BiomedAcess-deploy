@@ -7,23 +7,6 @@ import Announcements from '../components/Announcements.jsx';
 
 const HERO_BG = 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=1800&q=70&auto=format&fit=crop';
 
-const TIERS = [
-  {
-    name: 'Free',
-    price: 'ZMW 0',
-    note: 'Start learning today',
-    cta: { label: 'Create a free account', to: '/signup' },
-    features: ['Core courses and topics', 'Per-topic quizzes with instant grading', 'Community discussions', 'Progress dashboard', '24/7 tutor bot'],
-  },
-  {
-    name: 'Pro',
-    price: 'Coming soon',
-    note: 'Everything in Free, plus',
-    cta: null,
-    features: ['All Free features', 'Virtual labs', 'One-to-one mentorship', 'Advanced and paid courses', 'Priority support'],
-  },
-];
-
 // Feature cards: each carries a real lab photo and an icon
 const FEATURES = [
   {
@@ -192,8 +175,13 @@ export default function Landing() {
     { n: stats.courses, label: 'Courses', hint: 'across the lab disciplines' },
     { n: stats.topics, label: 'Topics', hint: 'structured lessons' },
     { n: stats.case_studies, label: 'Case studies', hint: 'clinical presentations' },
-    { n: stats.communities, label: 'Communities', hint: 'peer discussion groups' },
-  ] : [];
+    { n: stats.jobs, label: 'Career opportunities', hint: 'laboratory roles' },
+  ].filter((item) => Number(item.n) > 0) : [];
+  const cheapestPaidCourse = (courses || []).filter((c) => c.is_paid && String(c.currency).toLowerCase() === 'zmw' && Number(c.price_cents) > 0).sort((a, b) => a.price_cents - b.price_cents)[0];
+  const tiers = [
+    { name: 'Free', price: 'K0', note: 'Start learning today', cta: { label: 'Create a free account', to: '/signup' }, features: ['Core courses and topics', 'Topic quizzes', 'Progress dashboard'] },
+    ...(cheapestPaidCourse ? [{ name: 'Premium courses', price: `From K${(cheapestPaidCourse.price_cents / 100).toFixed(2)}`, note: 'One-time course pricing shown in the catalogue', cta: { label: 'Browse premium courses', to: '/courses' }, features: ['Premium course access', 'Course-specific outline and resources'] }] : []),
+  ];
 
   return (
     <div className="lp">
@@ -210,24 +198,14 @@ export default function Landing() {
               BiomedAccess is the learning platform built for the Laboratory Scientist: structured courses,
               instant quizzes, real clinical cases and certificates that employers can verify.
             </p>
-            <div className="lp-cta-row">
-              {user ? (
-                <Link to="/dashboard" className="btn teal lp-btn-lg">Go to your dashboard</Link>
-              ) : (
-                <Link to="/signup" className="btn teal lp-btn-lg">Start learning free</Link>
-              )}
-              <Link to="/courses" className="btn ghost lp-btn-lg lp-btn-outline">
-                Explore courses <Icon name="arrow" size={18} />
-              </Link>
-              <a href="/downloads/biomedaccess.apk" download className="btn ghost lp-btn-lg lp-btn-outline">
-                Download Android app
-              </a>
-              <a href="https://t.me/biomedaccess" target="_blank" rel="noreferrer" className="btn ghost lp-btn-lg lp-btn-outline">
-                Join our Telegram
-              </a>
-              <a href="https://t.me/biomedaccess_tutor_bot" target="_blank" rel="noreferrer" className="btn ghost lp-btn-lg lp-btn-outline">
-                BiomedAccess mini app
-              </a>
+            <div className="lp-cta-row lp-primary-cta">
+              {user ? <Link to="/dashboard" className="btn teal lp-btn-lg">Go to your dashboard</Link> : <Link to="/signup" className="btn teal lp-btn-lg">Start learning free</Link>}
+              <Link to="/courses" className="btn ghost lp-btn-lg lp-btn-outline">Browse courses <Icon name="arrow" size={18} /></Link>
+            </div>
+            <div className="lp-secondary-cta" aria-label="More ways to connect">
+              <a href="/downloads/biomedaccess.apk" download>Download Android app</a>
+              <a href="https://t.me/biomedaccess" target="_blank" rel="noreferrer">Join Telegram</a>
+              <a href="https://t.me/biomedaccess_tutor_bot" target="_blank" rel="noreferrer">Open mini app</a>
             </div>
             <p className="lp-micro">Free core courses · Built for Zambia and the region</p>
           </Reveal>
@@ -305,18 +283,13 @@ export default function Landing() {
                 <Link to={`/courses/${c.id}`} className="lp-course" role="listitem">
                   <div className="lp-course-top">
                     {c.level && <span className="badge">{c.level}</span>}
-                    {c.is_paid
-                      ? <span className="badge paid">Paid</span>
-                      : <span className="badge teal">Free</span>}
+                    {c.is_paid ? <span className="badge paid">Paid</span> : <span className="badge teal">Free</span>}
                   </div>
                   {c.image_url && <img className="lp-course-cover" src={c.image_url} alt={`${c.title} cover`} loading="lazy" />}
                   <h3>{c.title}</h3>
                   {c.discipline && <span className="lp-course-disc">{c.discipline}</span>}
                   <p className="muted small">{c.description}</p>
-                  <div className="lp-course-foot">
-                    <span className="small muted">{c.topic_count ?? 0} topics</span>
-                    <span className="lp-course-go">Open <Icon name="arrow" size={14} /></span>
-                  </div>
+                  <div className="lp-course-foot"><span className="small muted">{c.topic_count ?? 0} topics</span><span className="lp-course-go">Open <Icon name="arrow" size={14} /></span></div>
                 </Link>
               </Reveal>
             ))}
@@ -359,29 +332,25 @@ export default function Landing() {
       </section>
 
       {/* PRICING */}
-      <section className="lp-section">
-        <Reveal className="lp-head">
-          <span className="lp-eyebrow">Pricing</span>
-          <h2>Simple pricing</h2>
+  <section className="lp-section">
+    <Reveal className="lp-head">
+      <span className="lp-eyebrow">Pricing</span>
+      <h2>Simple pricing</h2>
+    </Reveal>
+    <div className="lp-pricing">
+      {tiers.map((t, i) => (
+        <Reveal key={t.name} delay={i * 100} className="card pricing-card lp-price-card">
+          <span className="badge teal">{t.name}</span>
+          <div className="price">{t.price}</div>
+          <p className="muted small">{t.note}</p>
+          <ul className="check-list">{t.features.map((f) => <li key={f}>{f}</li>)}</ul>
+          <Link to={t.cta.to} className="btn teal">{t.cta.label}</Link>
         </Reveal>
-        <div className="lp-pricing">
-          {TIERS.map((t, i) => (
-            <Reveal key={t.name} delay={i * 100} className={`card pricing-card lp-price-card ${t.name === 'Pro' ? 'pro' : ''}`}>
-              <span className="badge teal">{t.name}</span>
-              <div className="price">{t.price}</div>
-              <p className="muted small">{t.note}</p>
-              <ul className="check-list">
-                {t.features.map((f) => <li key={f}>{f}</li>)}
-              </ul>
-              {t.cta
-                ? <Link to={t.cta.to} className="btn teal">{t.cta.label}</Link>
-                : <button type="button" className="btn ghost" disabled>Coming soon</button>}
-            </Reveal>
-          ))}
-        </div>
-      </section>
+      ))}
+    </div>
+  </section>
 
-      {/* MISSION + PILLARS */}
+  {/* MISSION + PILLARS */}
       <section className="lp-section">
         <Reveal className="mission-block">
           <h2>Our Mission</h2>
@@ -404,6 +373,38 @@ export default function Landing() {
           </div>
           <p className="affiliation">Affiliated with Rusangu University · Content validated against HPCZ and ISO 15189 standards</p>
         </div>
+      </section>
+
+      {/* Proof near the learning claims */}
+      <section className="lp-section lp-proof">
+        <Reveal className="lp-head"><span className="lp-eyebrow">Learning proof</span><h2>Build skills you can show</h2></Reveal>
+        <div className="lp-proof-grid">
+          <Reveal className="card lp-certificate">
+            <svg className="lp-certificate-art" viewBox="0 0 800 520" role="img" aria-label="Sample BiomedAccess course certificate">
+              <rect x="12" y="12" width="776" height="496" rx="8" fill="#f8fafc" stroke="#10b981" strokeWidth="12" />
+              <rect x="36" y="36" width="728" height="448" rx="4" fill="none" stroke="#e07b39" strokeWidth="2" />
+              <text x="400" y="120" textAnchor="middle" fill="#064e3b" fontSize="38" fontFamily="Georgia,serif">BiomedAccess</text>
+              <text x="400" y="182" textAnchor="middle" fill="#334155" fontSize="24" fontFamily="Arial">CERTIFICATE OF COMPLETION</text>
+              <text x="400" y="258" textAnchor="middle" fill="#0f172a" fontSize="32" fontFamily="Georgia,serif">Sample Learner</text>
+              <text x="400" y="310" textAnchor="middle" fill="#475569" fontSize="19" fontFamily="Arial">has completed a course in Biomedical Laboratory Science</text>
+              <path d="M310 386h180" stroke="#10b981" strokeWidth="3" />
+              <text x="400" y="418" textAnchor="middle" fill="#64748b" fontSize="16" fontFamily="Arial">SAMPLE CERTIFICATE · NOT A REAL AWARD</text>
+            </svg>
+            <p className="muted small">Sample certificate design. Actual certificates are issued after course completion.</p>
+          </Reveal>
+          <Reveal className="lp-testimonials">
+            <h3>What our students say</h3>
+            <p className="muted small">Example quotes, created to illustrate the experience.</p>
+            <blockquote className="card lp-quote">“The topic quizzes help me revise between shifts.”<cite>Example quote · Zambian laboratory technologist</cite></blockquote>
+            <blockquote className="card lp-quote">“I can revisit core science at my own pace.”<cite>Example quote · Medical laboratory science student</cite></blockquote>
+            <blockquote className="card lp-quote">“The case discussions connect lessons to bench work.”<cite>Example quote · Zambian clinical laboratory scientist</cite></blockquote>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Partnerships and accreditation claims already on the site */}
+      <section className="lp-partnerships" aria-label="Partnerships and accreditation">
+        <div className="lp-head"><span className="lp-eyebrow">Partnerships &amp; accreditation</span><p className="affiliation">Existing site copy: Affiliated with Rusangu University · Content validated against HPCZ and ISO 15189 standards</p></div>
       </section>
 
       {/* 7. FOOTER */}

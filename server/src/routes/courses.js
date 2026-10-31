@@ -41,8 +41,10 @@ async function topicAccuracy(userId) {
 router.get('/courses', optionalAuth, async (req, res) => {
   const courses = (await db.all('SELECT * FROM courses WHERE published = 1 ORDER BY position, id', []));
   const enrolled = req.user ? new Set((await db.all('SELECT course_id FROM enrollments WHERE user_id = ?', [req.user.id])).map((r) => r.course_id)) : new Set();
-  const counts = (await db.all(`SELECT t.course_id, COUNT(DISTINCT t.id) topics FROM topics t GROUP BY t.course_id`, []));
+  const counts = (await db.all(`SELECT t.course_id, COUNT(DISTINCT t.id) topics,
+    COUNT(DISTINCT q.id) quizzes FROM topics t LEFT JOIN quizzes q ON q.topic_id = t.id GROUP BY t.course_id`, []));
   const topicCount = Object.fromEntries(counts.map((c) => [c.course_id, c.topics]));
+  const quizCount = Object.fromEntries(counts.map((c) => [c.course_id, c.quizzes]));
   const docCount = Object.fromEntries((await db.all('SELECT course_id, COUNT(*) n FROM course_documents GROUP BY course_id', [])).map((r) => [r.course_id, r.n]));
   const examCount = Object.fromEntries((await db.all('SELECT course_id, COUNT(*) n FROM exams GROUP BY course_id', [])).map((r) => [r.course_id, r.n]));
   const out = [];
@@ -52,6 +54,7 @@ router.get('/courses', optionalAuth, async (req, res) => {
       image_url: c.image_url || null, tracks: c.tracks || null,
       is_paid: !!c.is_paid, price_cents: c.price_cents, currency: c.currency,
       topic_count: topicCount[c.id] || 0,
+      quiz_count: quizCount[c.id] || 0,
       document_count: docCount[c.id] || 0,
       exam_count: examCount[c.id] || 0,
       enrolled: enrolled.has(c.id),

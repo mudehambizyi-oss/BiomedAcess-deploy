@@ -10,6 +10,7 @@ export default function CourseCard({ course }) {
     <Link to={`/courses/${course.id}`} className="card course-card">
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <span className="badge">{course.level}</span>
+        {course.catalog_category && <span className="badge discipline">{course.catalog_category}</span>}
         {course.discipline && <span className="badge discipline">{course.discipline}</span>}
         {course.is_paid ? <span className="badge paid">{formatPrice(course.price_cents, course.currency)}</span> : <span className="badge teal">Free</span>}
       </div>
