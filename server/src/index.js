@@ -11,6 +11,7 @@ dotenv.config();
 import './db.js';
 import { runExpansionSeed } from './seed-expand.js';
 import { runCaseSeed } from './seed-cases.js';
+import caseRoutes from './routes/cases.js';
 import authRoutes from './routes/auth.js';
 import courseRoutes from './routes/courses.js';
 import resourceRoutes from './routes/resources.js';
