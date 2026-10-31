@@ -49,6 +49,7 @@ router.get('/courses', optionalAuth, async (req, res) => {
   for (const c of courses) {
     out.push({
       id: c.id, slug: c.slug, title: c.title, description: c.description, level: c.level, discipline: c.discipline || '',
+      image_url: c.image_url || null, tracks: c.tracks || null,
       is_paid: !!c.is_paid, price_cents: c.price_cents, currency: c.currency,
       topic_count: topicCount[c.id] || 0,
       document_count: docCount[c.id] || 0,
